@@ -136,7 +136,7 @@ ListFrame<Object> lines = ListFrame.fromList(list);
 list = lines.toList();
 ```
 
-##### 6.Convert Map to Object
+##### 7.Convert Map to Object
 
 ```java
 
