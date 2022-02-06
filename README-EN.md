@@ -7,7 +7,7 @@
 <div >
     <img src='https://shields.io/badge/version-1.0.0-green.svg'>
     <img src='https://shields.io/badge/author-Chang Zhang-dbab09.svg'>
-    <h4>a extended tool of List about how to process data by lambda,expressions and custom class.</h4>
+    <h4>An extended tool of List about how to process data by lambda,expressions and custom class.</h4>
 </div>
 
 * Process data stream fluently
