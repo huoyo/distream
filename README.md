@@ -22,6 +22,7 @@ lines = lines
 
 * 便携数据库读取
 
+
 ```java
 Datasource datesource = xxx;
 ListFrame list = new ListFrame();
@@ -30,6 +31,15 @@ list.initDataSource(datesource);
 lines = list.readSql("select * from xxx").handle(a->...).handle(a->...)...;
 ```
 
+> 注意：读取数据库的时候需要引入对应的连接驱动，比如Mysql:
+
+```
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.22</version>
+</dependency>
+```
 
 #### 引入
 

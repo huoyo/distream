@@ -30,6 +30,16 @@ list.initDataSource(datesource);
 lines = list.readSql("select * from xxx").handle(a->...).handle(a->...)...;
 ```
 
+> Notice：you need add a dependency about connecting database such as Mysql:
+
+```
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.22</version>
+</dependency>
+```
+
 
 #### Maven dependency
 
