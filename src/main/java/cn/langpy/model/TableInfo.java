@@ -1,4 +1,4 @@
-package cn.langpy.core;
+package cn.langpy.model;
 
 public class TableInfo {
     private String name;

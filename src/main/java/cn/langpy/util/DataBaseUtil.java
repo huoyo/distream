@@ -1,9 +1,9 @@
 package cn.langpy.util;
 
-import cn.langpy.core.DataBaseConfig;
-import cn.langpy.core.DataBaseType;
+import cn.langpy.model.DataBaseConfig;
+import cn.langpy.constant.DataBaseType;
 import cn.langpy.core.ListFrame;
-import cn.langpy.core.TableInfo;
+import cn.langpy.model.TableInfo;
 import com.alibaba.druid.pool.DruidDataSource;
 
 import javax.sql.DataSource;

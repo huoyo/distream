@@ -1,5 +1,10 @@
 package cn.langpy.util;
 
+import cn.langpy.model.ExpressionMap;
+import cn.langpy.constant.Functions;
+import cn.langpy.model.OperateMap;
+import cn.langpy.constant.ParamType;
+
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
@@ -31,8 +36,8 @@ public class ExpressUtil {
 
     private static Pattern substringPattern = Pattern.compile("^substring\\(.+,\\s*[0-9]+,\\s*[0-9]+\\s*\\)$");
 
-    public static List<Map<String, String>> getOperates(String expresses) {
-        List<Map<String, String>> ops = new ArrayList<>();
+    public static List<ExpressionMap> getOperates(String expresses) {
+        List<ExpressionMap> ops = new ArrayList<>();
         String[] expressesSplit = expresses.split(";");
         for (String express : expressesSplit) {
             String[] expressSplit = express.split("=");
@@ -50,24 +55,87 @@ public class ExpressUtil {
                 operater = m.group();
             }
 
-            Map<String, String> map = new HashMap<>();
-            map.put("leftKey", leftKey);
-            map.put("operateKey1", operateKey1);
-            map.put("operateKey2", operateKey2);
-            map.put("operater", operater);
-            ops.add(map);
+            ExpressionMap expressionMap = new ExpressionMap();
+            expressionMap.setAssignKey(leftKey);
+            expressionMap.setOperateSymbol(operater);
+            OperateMap leftOperateMap = getOperateInfo(operateKey1);
+            OperateMap rightOperateMap = getOperateInfo(operateKey2);
+            expressionMap.setOperate1(leftOperateMap);
+            expressionMap.setOperate2(rightOperateMap);
+            ops.add(expressionMap);
         }
         return ops;
     }
 
-    public static <E> E operate(E datum, Map<String, String> op) {
-        String leftKey = op.get("leftKey");
-        String operateKey1 = op.get("operateKey1");
-        String operateKey2 = op.get("operateKey2");
-        String operater = op.get("operater");
+    public static OperateMap getOperateInfo(String key) {
+        if (key == null) {
+            return null;
+        }
+        OperateMap leftOperateMap = new OperateMap();
+        if (intPattern.matcher(key).find()) {
+            leftOperateMap.setParamType(ParamType.INT);
+            List<Object> params = new ArrayList<>();
+            params.add(Integer.valueOf(key));
+            leftOperateMap.setParams(params);
+        } else if (doublePattern.matcher(key).find()) {
+            leftOperateMap.setParamType(ParamType.DOUBLE);
+            List<Object> params = new ArrayList<>();
+            params.add(Double.valueOf(key));
+            leftOperateMap.setParams(params);
+        } else if (stringPattern.matcher(key).find()) {
+            leftOperateMap.setParamType(ParamType.STRING);
+            List<Object> params = new ArrayList<>();
+            params.add(key.replace("'", ""));
+            leftOperateMap.setParams(params);
+        } else if (formatPattern.matcher(key).find()) {
+            String newKey = key.substring(7, key.indexOf(","));
+            String d = key.substring(key.indexOf(",") + 1, key.indexOf(",") + 2);
+            leftOperateMap.setParamType(ParamType.FUNCTION);
+            leftOperateMap.setFunc(Functions.FORMAT);
+            List<Object> params = new ArrayList<>();
+            params.add(newKey);
+            params.add(Integer.valueOf(d));
+            leftOperateMap.setParams(params);
+        } else if (replacePattern.matcher(key).find()) {
+            String newKey = key.substring(8, key.indexOf(",")).trim();
+            String[] split = key.split(",");
+            String src = split[1].trim().replace("'", "");
+            String tar = (split[2].substring(0, split[2].indexOf(")"))).replace("'", "");
+            leftOperateMap.setParamType(ParamType.FUNCTION);
+            leftOperateMap.setFunc(Functions.REPLACE);
+            List<Object> params = new ArrayList<>();
+            params.add(newKey);
+            params.add(src);
+            params.add(tar);
+            leftOperateMap.setParams(params);
 
-        Object value1 = getValue(operateKey1, datum);
-        Object value2 = getValue(operateKey2, datum);
+        } else if (substringPattern.matcher(key).find()) {
+            String newKey = key.substring(10, key.indexOf(",")).trim();
+            String[] split = key.split(",");
+            int subStart = Integer.valueOf(split[1].trim());
+            int subEnd = Integer.valueOf((split[2].substring(0, split[2].indexOf(")"))).trim());
+            leftOperateMap.setParamType(ParamType.FUNCTION);
+            leftOperateMap.setFunc(Functions.SUBSTRING);
+            List<Object> params = new ArrayList<>();
+            params.add(newKey);
+            params.add(subStart);
+            params.add(subEnd);
+            leftOperateMap.setParams(params);
+        } else {
+            leftOperateMap.setParamType(ParamType.VARIABLE);
+            List<Object> params = new ArrayList<>();
+            params.add(key);
+            leftOperateMap.setParams(params);
+        }
+        return leftOperateMap;
+    }
+
+    public static <E> E operate(E datum, ExpressionMap op) {
+        String leftKey = op.getAssignKey();
+        String operater = op.getOperateSymbol();
+
+        Object value1 = getValue(op.getOperate1(), datum);
+        Object value2 = getValue(op.getOperate2(), datum);
 
         if (operater.equals("+")) {
             datum = ComputeUtil.add(leftKey, value1, value2, datum);
@@ -84,43 +152,41 @@ public class ExpressUtil {
     }
 
 
+    public static Object getValue(OperateMap operateMap, Object param) {
+        if (operateMap == null) {
+            return null;
+        }
+        if (operateMap.getParamType() == ParamType.INT || operateMap.getParamType() == ParamType.DOUBLE || operateMap.getParamType() == ParamType.STRING) {
+            return operateMap.getParams().get(0);
+        }
+        String key = null;
+        if (operateMap.getParamType() == ParamType.VARIABLE || operateMap.getParamType() == ParamType.FUNCTION) {
+            key = operateMap.getParams().get(0).toString();
+        }
+        Object keyValue = getValue(key, param);
+        if (operateMap.getFunc() == Functions.FORMAT) {
+            int d = (int) operateMap.getParams().get(1);
+            BigDecimal bigDecimal = new BigDecimal((double) keyValue);
+            double doubleValue = bigDecimal.setScale(d, BigDecimal.ROUND_HALF_UP).doubleValue();
+            return doubleValue;
+        }
+        if (operateMap.getFunc() == Functions.REPLACE) {
+            String src = operateMap.getParams().get(1).toString();
+            String tar = operateMap.getParams().get(2).toString();
+            return keyValue.toString().replace(src, tar);
+        }
+        if (operateMap.getFunc() == Functions.SUBSTRING) {
+            int subStart = (int) operateMap.getParams().get(1);
+            int subEnd = (int) operateMap.getParams().get(2);
+            return keyValue.toString().substring(subStart, subEnd);
+        }
+        return keyValue;
+    }
+
+
     public static Object getValue(String key, Object param) {
         if (key == null) {
             return null;
-        }
-        if (intPattern.matcher(key).find()) {
-            return Integer.valueOf(key);
-        }
-        if (doublePattern.matcher(key).find()) {
-            return Double.valueOf(key);
-        }
-        if (stringPattern.matcher(key).find()) {
-            return key.replace("'", "");
-        }
-        String d = null;
-        if (formatPattern.matcher(key).find()) {
-            String newKey = key.substring(7, key.indexOf(","));
-            d = key.substring(key.indexOf(",")+1, key.indexOf(",") + 2);
-            key = newKey;
-        }
-        String src = null;
-        String tar = null;
-        if (replacePattern.matcher(key).find()) {
-            String newKey = key.substring(8, key.indexOf(",")).trim();
-            String[] split = key.split(",");
-            src = split[1].trim().replace("'","");
-            tar = (split[2].substring(0,split[2].indexOf(")"))).replace("'","");
-            key = newKey;
-        }
-
-        int subStart = 0;
-        int subEnd = 0;
-        if (substringPattern.matcher(key).find()) {
-            String newKey = key.substring(10, key.indexOf(",")).trim();
-            String[] split = key.split(",");
-            subStart = Integer.valueOf(split[1].trim());
-            subEnd = Integer.valueOf((split[2].substring(0,split[2].indexOf(")"))).trim());
-            key = newKey;
         }
         Object keyValue = null;
         if (param instanceof Map) {
@@ -146,17 +212,6 @@ public class ExpressUtil {
             } finally {
                 keyField.setAccessible(false);
             }
-        }
-        if (d != null && keyValue instanceof Double) {
-            BigDecimal bigDecimal = new BigDecimal((double)keyValue);
-            double doubleValue = bigDecimal.setScale(Integer.valueOf(d), BigDecimal.ROUND_HALF_UP).doubleValue();
-            return doubleValue;
-        }
-        if (src!=null) {
-            return keyValue.toString().replace(src,tar);
-        }
-        if (subEnd!=0) {
-            return keyValue.toString().substring(subStart,subEnd);
         }
         return keyValue;
     }

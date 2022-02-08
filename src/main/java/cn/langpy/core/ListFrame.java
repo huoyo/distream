@@ -1,6 +1,8 @@
 package cn.langpy.core;
 
 
+import cn.langpy.model.DataBaseConfig;
+import cn.langpy.model.ExpressionMap;
 import cn.langpy.util.DataBaseUtil;
 import cn.langpy.util.ExpressUtil;
 
@@ -401,10 +403,10 @@ public class ListFrame<E> extends ArrayList<E> {
      * @return ListFrame
      */
     public ListFrame<E> handle(String expressions) {
-        List<Map<String, String>> ops = ExpressUtil.getOperates(expressions);
+        List<ExpressionMap> ops = ExpressUtil.getOperates(expressions);
         ListFrame<E> numFrame = new ListFrame<E>();
         for (E datum : data) {
-            for (Map<String, String> op : ops) {
+            for (ExpressionMap op : ops) {
                 datum = ExpressUtil.operate(datum, op);
             }
             numFrame.add(datum);

@@ -1,4 +1,4 @@
-package cn.langpy.core;
+package cn.langpy.constant;
 
 public enum DataBaseType {
     MYSQL,

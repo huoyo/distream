@@ -1,4 +1,6 @@
-package cn.langpy.core;
+package cn.langpy.model;
+
+import cn.langpy.constant.DataBaseType;
 
 public class DataBaseConfig {
     private String host;
