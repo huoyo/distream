@@ -1,5 +1,6 @@
 package cn.langpy.util;
 
+import cn.langpy.core.FunctionCenter;
 import cn.langpy.model.ExpressionMap;
 import cn.langpy.constant.Functions;
 import cn.langpy.model.OperateMap;
@@ -9,6 +10,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -164,21 +166,9 @@ public class ExpressUtil {
             key = operateMap.getParams().get(0).toString();
         }
         Object keyValue = getValue(key, param);
-        if (operateMap.getFunc() == Functions.FORMAT) {
-            int d = (int) operateMap.getParams().get(1);
-            BigDecimal bigDecimal = new BigDecimal((double) keyValue);
-            double doubleValue = bigDecimal.setScale(d, BigDecimal.ROUND_HALF_UP).doubleValue();
-            return doubleValue;
-        }
-        if (operateMap.getFunc() == Functions.REPLACE) {
-            String src = operateMap.getParams().get(1).toString();
-            String tar = operateMap.getParams().get(2).toString();
-            return keyValue.toString().replace(src, tar);
-        }
-        if (operateMap.getFunc() == Functions.SUBSTRING) {
-            int subStart = (int) operateMap.getParams().get(1);
-            int subEnd = (int) operateMap.getParams().get(2);
-            return keyValue.toString().substring(subStart, subEnd);
+        BiFunction<Object, OperateMap, Object> biFunction = FunctionCenter.planConsumer.get(operateMap.getFunc());
+        if (biFunction != null) {
+            return biFunction.apply(keyValue, operateMap);
         }
         return keyValue;
     }
