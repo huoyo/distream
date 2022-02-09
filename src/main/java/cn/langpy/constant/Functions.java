@@ -6,5 +6,6 @@ public enum Functions {
     INT,
     DOUBLE,
     STRING,
+    INDEX,
     FORMAT;
 }

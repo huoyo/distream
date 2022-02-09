@@ -72,6 +72,12 @@ public class ListFrame<E> extends ArrayList<E> {
         }
     }
 
+    public void initDataSource(DataBaseConfig dataBaseConfig) {
+        if (this.dataSource == null) {
+            this.dataSource = DataBaseUtil.getDataSource(dataBaseConfig);
+        }
+    }
+
     public ListFrame<Map<String, Object>> readSql(String sql) {
         if (this.dataSource == null) {
             throw new RuntimeException("please initilize datasource first!");

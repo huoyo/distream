@@ -39,7 +39,8 @@ public class DataBaseUtil {
             dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
             dataSource.setUrl(String.format("jdbc:mysql://%s:%s/%s", dataBaseConfig.getHost(), dataBaseConfig.getPort(), dataBaseConfig.getDatabase()));
         } else if (dataBaseConfig.getDatabaseType() == DataBaseType.ORACLE) {
-            throw new RuntimeException("unsupported operate!");
+            dataSource.setDriverClassName("oracle.jdbc.driver.OracleDriver");
+            dataSource.setUrl(String.format("jdbc:oracle:thin:@%s:%s:%s", dataBaseConfig.getHost(), dataBaseConfig.getPort(), dataBaseConfig.getDatabase()));
         }else {
             throw new RuntimeException("please define DataBaseType!");
         }

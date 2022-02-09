@@ -28,9 +28,13 @@ public class ExpressUtil {
 
     private static Pattern doublePattern = Pattern.compile("^[0-9]+\\.[0-9]+$");
 
-    private static Pattern sumPattern = Pattern.compile("^sum\\(.+\\)$");
+    private static Pattern indexPattern = Pattern.compile("^index\\(.+\\s*,'.*'\\s*\\)$");
 
-    private static Pattern avgPattern = Pattern.compile("^avg\\(.+\\)$");
+    private static Pattern toIntPattern = Pattern.compile("^int\\(.+\\s*\\)$");
+
+    private static Pattern toDoublePattern = Pattern.compile("^double\\(.+\\s*\\)$");
+
+    private static Pattern toStringPattern = Pattern.compile("^string\\(.+\\s*\\)$");
 
     private static Pattern formatPattern = Pattern.compile("^format\\(.+,\\s*[0-9]+\\s*\\)$");
 
@@ -123,7 +127,38 @@ public class ExpressUtil {
             params.add(subStart);
             params.add(subEnd);
             leftOperateMap.setParams(params);
-        } else {
+        }  else if (toIntPattern.matcher(key).find()) {
+            String newKey = key.substring(4, key.indexOf(")"));
+            leftOperateMap.setParamType(ParamType.FUNCTION);
+            leftOperateMap.setFunc(Functions.INT);
+            List<Object> params = new ArrayList<>();
+            params.add(newKey);
+            leftOperateMap.setParams(params);
+        } else if (toDoublePattern.matcher(key).find()) {
+            String newKey = key.substring(7, key.indexOf(")"));
+            leftOperateMap.setParamType(ParamType.FUNCTION);
+            leftOperateMap.setFunc(Functions.DOUBLE);
+            List<Object> params = new ArrayList<>();
+            params.add(newKey);
+            leftOperateMap.setParams(params);
+        }else if (toStringPattern.matcher(key).find()) {
+            String newKey = key.substring(7, key.indexOf(")"));
+            leftOperateMap.setParamType(ParamType.FUNCTION);
+            leftOperateMap.setFunc(Functions.STRING);
+            List<Object> params = new ArrayList<>();
+            params.add(newKey);
+            leftOperateMap.setParams(params);
+        }else if (indexPattern.matcher(key).find()) {
+            String newKey = key.substring(6, key.indexOf(","));
+            String src = key.substring(key.indexOf(",") + 1, key.indexOf(")"));
+            leftOperateMap.setParamType(ParamType.FUNCTION);
+            leftOperateMap.setFunc(Functions.INDEX);
+            List<Object> params = new ArrayList<>();
+            params.add(newKey.trim());
+            params.add(src.trim().replace("'",""));
+            leftOperateMap.setParams(params);
+        }
+        else {
             leftOperateMap.setParamType(ParamType.VARIABLE);
             List<Object> params = new ArrayList<>();
             params.add(key);

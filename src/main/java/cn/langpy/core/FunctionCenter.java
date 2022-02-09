@@ -17,6 +17,10 @@ public class FunctionCenter {
         planConsumer.put(Functions.REPLACE, (value, operateMap) -> replace(value, operateMap));
         planConsumer.put(Functions.SUBSTRING, (value, operateMap) -> substring(value, operateMap));
         planConsumer.put(Functions.FORMAT, (value, operateMap) -> format(value, operateMap));
+        planConsumer.put(Functions.INT, (value, operateMap) -> toInt(value, operateMap));
+        planConsumer.put(Functions.DOUBLE, (value, operateMap) -> toDouble(value, operateMap));
+        planConsumer.put(Functions.STRING, (value, operateMap) -> toString(value, operateMap));
+        planConsumer.put(Functions.INDEX, (value, operateMap) -> index(value, operateMap));
     }
 
 
@@ -37,5 +41,34 @@ public class FunctionCenter {
         BigDecimal bigDecimal = new BigDecimal((double) value);
         double doubleValue = bigDecimal.setScale(d, BigDecimal.ROUND_HALF_UP).doubleValue();
         return doubleValue;
+    }
+
+    private static Object toInt(Object value, OperateMap operateMap) {
+        if (value==null) {
+            throw new RuntimeException("can not convert null to int!");
+        }
+        if (value.toString().matches("[0-9]+\\.[0-9]+")) {
+            return Integer.valueOf(value.toString().split("\\.")[0]);
+        }
+        return Integer.valueOf(value.toString());
+    }
+    private static Object toDouble(Object value, OperateMap operateMap) {
+        if (value==null) {
+            throw new RuntimeException("can not convert null to double!");
+        }
+        return Double.valueOf(value.toString());
+    }
+    private static Object toString(Object value, OperateMap operateMap) {
+        if (value==null) {
+           return null;
+        }
+        return value.toString();
+    }
+
+    private static Object index(Object value, OperateMap operateMap) {
+        if (value==null) {
+            return 0;
+        }
+        return value.toString().indexOf(operateMap.getParams().get(1).toString());
     }
 }

@@ -23,7 +23,8 @@ public class HandleObject {
 //        baseInfos.replace("name","张三","9999");
 //        ListFrame<Double> scores = baseInfos.get(BaseInfo::getScore);
 //        baseInfos.handle("score=format(score,2)+10");
-        baseInfos.handle("name=replace(name,'李四','8888')");
+//        baseInfos.handle("name=replace(name,'李四','8888')");
+        baseInfos.handle("id=index(subject,'文')");
         System.out.println(baseInfos);
     }
 }
