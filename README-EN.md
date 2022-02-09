@@ -161,6 +161,33 @@ ListFrame<User> users = lines.toObject(User.class);
 lines = lines.replace("需要替换的列","xxx","yyy");
 ```
 
+##### 9.Common functions
+
+```java
+/*replace "xxx" to "yyy"*/
+ListFrame<Map<String, Object>> lines = xxx;
+/*convert code to int*/
+lines = lines.handle("id=int(code)");
+
+/*convert value to double*/
+lines = lines.handle("percent=double(value)");
+
+/*convert value to string*/
+lines = lines.handle("name=string(value)");
+
+/*substring like java substring*/
+lines = lines.handle("name=substring(name,1,2)");
+
+/*replace "xxx" to "yyy"*/
+lines = lines.handle("name=replace(name,'xxx','yyy')");
+
+/*index like java indexof*/
+lines = lines.handle("id=index(name,'xxx')");
+
+/*round to the nearest hundredth*/
+lines = lines.handle("percent=format(percent,2)");
+```
+
 
 #### Copyright
 

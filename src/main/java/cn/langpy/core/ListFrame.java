@@ -93,13 +93,6 @@ public class ListFrame<E> extends ArrayList<E> {
         return DataBaseUtil.readSql(sql, config);
     }
 
-
-    /**
-     * read data from txt/csv
-     *
-     * @param path
-     * @return
-     */
     public static ListFrame<String> readString(String path) {
         File file = new File(path);
         ListFrame<String> listFrame = new ListFrame();
@@ -119,23 +112,10 @@ public class ListFrame<E> extends ArrayList<E> {
         return listFrame;
     }
 
-    /**
-     * read data from txt/csv
-     *
-     * @param path
-     * @return
-     */
     public static ListFrame<Map<String, Object>> readMap(String path) {
         return readMap(path, ",");
     }
 
-    /**
-     * convert a map to a obejct
-     *
-     * @param beanClass
-     * @param <T>
-     * @return
-     */
     public <T> ListFrame<T> toObject(Class<T> beanClass) {
         ListFrame<T> listFrame = new ListFrame<>();
         try {
@@ -166,14 +146,6 @@ public class ListFrame<E> extends ArrayList<E> {
         return object;
     }
 
-    /**
-     * read data from txt/csv
-     *
-     * @param path
-     * @param splitBy
-     * @param columnTypes
-     * @return
-     */
     public static ListFrame<Map<String, Object>> readMap(String path, String splitBy, List<Class> columnTypes) {
         File file = new File(path);
         ListFrame<Map<String, Object>> listFrame = new ListFrame();
@@ -204,14 +176,6 @@ public class ListFrame<E> extends ArrayList<E> {
         return listFrame;
     }
 
-    /**
-     * read data from txt/csv
-     *
-     * @param path
-     * @param splitBy
-     * @param columnTypes
-     * @return
-     */
     public static ListFrame<Map<String, Object>> readMap(String path, String splitBy, Class[] columnTypes) {
         return readMap(path, splitBy, Arrays.stream(columnTypes).collect(Collectors.toList()));
     }
@@ -230,13 +194,6 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
 
-    /**
-     * read data from txt/csv
-     *
-     * @param path
-     * @param splitBy
-     * @return
-     */
     public static ListFrame<Map<String, Object>> readMap(String path, String splitBy) {
         File file = new File(path);
         ListFrame<Map<String, Object>> listFrame = new ListFrame();
@@ -278,13 +235,7 @@ public class ListFrame<E> extends ArrayList<E> {
         }
     }
 
-    /**
-     * obtain data list by a property
-     *
-     * @param fun such as UserInfo::getName
-     * @param <T>
-     * @return
-     */
+
     public <T> ListFrame<T> get(Function<E, T> fun) {
         ListFrame<T> listFrame = new ListFrame<>();
         Object o = data.get(0);
@@ -298,13 +249,6 @@ public class ListFrame<E> extends ArrayList<E> {
         }
     }
 
-    /**
-     * obtain data list by a column name
-     *
-     * @param columnName
-     * @param <T>
-     * @return
-     */
     public <T> ListFrame<T> get(String columnName) {
         ListFrame<Object> objects = columnData.get(columnName);
         if (null != objects) {
@@ -387,12 +331,6 @@ public class ListFrame<E> extends ArrayList<E> {
         }
     }
 
-    /**
-     * process data by a implement from DataHandler<E>
-     *
-     * @param dataProcess
-     * @return ListFrame
-     */
     public ListFrame<E> handle(DataHandlerInterface<E> dataProcess) {
         ListFrame<E> numFrame = new ListFrame<E>();
         for (E datum : data) {
@@ -402,12 +340,7 @@ public class ListFrame<E> extends ArrayList<E> {
         return numFrame;
     }
 
-    /**
-     * process data by string expression
-     *
-     * @param expressions
-     * @return ListFrame
-     */
+
     public ListFrame<E> handle(String expressions) {
         List<ExpressionMap> ops = ExpressUtil.getOperates(expressions);
         ListFrame<E> numFrame = new ListFrame<E>();
@@ -421,12 +354,7 @@ public class ListFrame<E> extends ArrayList<E> {
         return numFrame;
     }
 
-    /**
-     * process data by lambda expression
-     *
-     * @param fun
-     * @return ListFrame
-     */
+
     public <T> ListFrame<T> handle(Function<E, T> fun) {
         ListFrame<T> numFrame = new ListFrame<T>();
         for (E datum : data) {
@@ -594,21 +522,12 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
 
-    /**
-     * convert ListFrame to List
-     *
-     * @return List
-     */
+
     public List<E> toList() {
         return data;
     }
 
 
-    /**
-     * generate a txt file from ListFrame
-     *
-     * @param path file path such as "c:/demo.txt"
-     */
     public void toFile(String path) {
         try (
                 FileWriter writer = new FileWriter(path);
