@@ -19,7 +19,7 @@ public class HandleMap {
         /*define data types*/
         ListFrame<Map<String, Object>> lines = ListFrame.readMap(path,",",new Class[]{Integer.class,String.class,Integer.class,Double.class});
         lines = lines
-                .handle("收入=收入*0.8")
+                .handle("收入1=收入*0.8")
                 .handle("序号='0'+序号;姓名=序号+姓名")//add "0" at the front of 序号;rename 姓名 by 序号+姓名
                 .handle(new MapHandler());//add a key named "newKey" whose value is 1
 
@@ -39,7 +39,7 @@ public class HandleMap {
         Map<Object, ListFrame> incomeConcat = agesGroup.concat("收入");
 
         /*save to file*/
-        lines.toFile("src/main/java/cn/langpy/test/save.txt");
+//        lines.toFile("src/main/java/cn/langpy/test/save.txt");
 
     }
 }

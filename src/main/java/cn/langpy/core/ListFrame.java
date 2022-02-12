@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -331,22 +332,31 @@ public class ListFrame<E> extends ArrayList<E> {
         }
     }
 
-    public ListFrame<E> handle(DataHandlerInterface<E> dataProcess) {
+    public ListFrame<E> handle(Predicate<E> condition, DataHandlerInterface<E> dataProcess) {
         ListFrame<E> numFrame = new ListFrame<E>();
         for (E datum : data) {
-            numFrame.add(dataProcess.handle(datum));
+            if (condition.test(datum)) {
+                numFrame.add(dataProcess.handle(datum));
+            } else {
+                numFrame.add(datum);
+            }
         }
         numFrame.setColumns(data.getColumns());
         return numFrame;
     }
 
+    public ListFrame<E> handle(DataHandlerInterface<E> dataProcess) {
+        return handle(a -> true, dataProcess);
+    }
 
-    public ListFrame<E> handle(String expressions) {
+    public ListFrame<E> handle(Predicate<E> condition, String expressions) {
         List<ExpressionMap> ops = ExpressUtil.getOperates(expressions);
         ListFrame<E> numFrame = new ListFrame<E>();
         for (E datum : data) {
             for (ExpressionMap op : ops) {
-                datum = ExpressUtil.operate(datum, op);
+                if (condition.test(datum)) {
+                    datum = ExpressUtil.operate(datum, op);
+                }
             }
             numFrame.add(datum);
         }
@@ -355,13 +365,25 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
 
-    public <T> ListFrame<T> handle(Function<E, T> fun) {
+    public ListFrame<E> handle(String expressions) {
+        return handle(a -> true, expressions);
+    }
+
+    public <T> ListFrame<T> handle(Predicate<E> condition, Function<E, T> fun) {
         ListFrame<T> numFrame = new ListFrame<T>();
         for (E datum : data) {
-            numFrame.add(fun.apply(datum));
+            if (condition.test(datum)) {
+                numFrame.add(fun.apply(datum));
+            } else {
+                numFrame.add((T) datum);
+            }
         }
         numFrame.setColumns(data.getColumns());
         return numFrame;
+    }
+
+    public <T> ListFrame<T> handle(Function<E, T> fun) {
+        return handle(a -> true, fun);
     }
 
     public MapFrame<Object, ListFrame> groupBy(String columnName) {
@@ -520,7 +542,6 @@ public class ListFrame<E> extends ArrayList<E> {
         }
         return sum;
     }
-
 
 
     public List<E> toList() {
