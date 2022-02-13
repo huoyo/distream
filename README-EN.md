@@ -15,9 +15,10 @@
 ```java
 lines = lines
         .handle("value=format(value,2)")
+        .handle(line->line.getName()==null,"name=''")
         .handle("name=replace(name,'#','')")
         .handle("percent=value/"+sum)
-        .groupBy("name").sum("value");
+        .groupBy("name").sum("percent");
 ```
 
 * Read data easily by sql 
@@ -48,7 +49,7 @@ lines = list.readSql("select * from xxx").handle(a->...).handle(a->...)...;
  <dependency>
     <groupId>cn.langpy</groupId>
     <artifactId>distream</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
  </dependency>
 ```
 
