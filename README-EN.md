@@ -15,7 +15,7 @@
 ```java
 lines = lines
         .handle("value=format(value,2)")
-        .handle(line->line.getName()==null,"name=''")
+        .handle(line->line.getName()==null,"name=''") //if(line.getName()==null){line.setName('');}
         .handle("name=replace(name,'#','')")
         .handle("percent=value/"+sum)
         .groupBy("name").sum("percent");
