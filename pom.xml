@@ -6,18 +6,13 @@
 
     <groupId>cn.langpy</groupId>
     <artifactId>distream</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <dependencies>
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
             <version>1.1.10</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>mysql</groupId>-->
-<!--            <artifactId>mysql-connector-java</artifactId>-->
-<!--            <version>8.0.22</version>-->
-<!--        </dependency>-->
     </dependencies>
     <name>distream</name>
     <description>a extended tool of List about how to process data by lambda,expressions and custom class</description>
