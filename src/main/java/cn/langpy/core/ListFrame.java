@@ -119,6 +119,12 @@ public class ListFrame<E> extends ArrayList<E> {
 
     public <T> ListFrame<T> toObject(Class<T> beanClass) {
         ListFrame<T> listFrame = new ListFrame<>();
+        if (this.data==null) {
+            return null;
+        }
+        if (this.data.size()==0) {
+            return listFrame;
+        }
         try {
             for (E datum : data) {
                 Map map = (Map) datum;
@@ -129,6 +135,39 @@ public class ListFrame<E> extends ArrayList<E> {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+        }
+        return listFrame;
+    }
+
+    public ListFrame<Map<String,Object>> toMap() {
+        if (this.data==null) {
+            return null;
+        }
+        ListFrame<Map<String,Object>> listFrame = new ListFrame<>();
+        if (this.data.size()==0) {
+            return listFrame;
+        }
+        E e1 = data.get(0);
+        if (e1 instanceof Map) {
+            return (ListFrame<Map<String,Object>>)this.data;
+        }
+        Field[] fields = data.get(0).getClass().getDeclaredFields();
+        for (E datum : data) {
+            Map<String,Object> map = new HashMap<>();
+            for (Field field : fields) {
+                int mod = field.getModifiers();
+                if (Modifier.isStatic(mod) || Modifier.isFinal(mod)) {
+                    continue;
+                }
+                try {
+                    field.setAccessible(true);
+                    map.put(field.getName(),field.get(datum));
+                    field.setAccessible(false);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            listFrame.add(map);
         }
         return listFrame;
     }
@@ -239,6 +278,12 @@ public class ListFrame<E> extends ArrayList<E> {
 
     public <T> ListFrame<T> get(Function<E, T> fun) {
         ListFrame<T> listFrame = new ListFrame<>();
+        if (this.data==null) {
+            return null;
+        }
+        if (this.data.size()==0) {
+            return listFrame;
+        }
         Object o = data.get(0);
         if (o instanceof String || o instanceof Map) {
             throw new RuntimeException("unsupported operate!");
@@ -256,7 +301,12 @@ public class ListFrame<E> extends ArrayList<E> {
             return (ListFrame<T>) objects;
         }
         ListFrame<Object> listFrame = new ListFrame<>();
-
+        if (this.data==null) {
+            return null;
+        }
+        if (this.data.size()==0) {
+            return new ListFrame<T>();
+        }
         Object o = data.get(0);
         if (o instanceof String) {
             throw new RuntimeException("unsupported operate!");

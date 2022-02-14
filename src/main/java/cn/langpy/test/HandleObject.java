@@ -24,7 +24,8 @@ public class HandleObject {
 //        ListFrame<Double> scores = baseInfos.get(BaseInfo::getScore);
 //        baseInfos.handle("score=format(score,2)+10");
 //        baseInfos.handle("name=replace(name,'李四','8888')");
-        baseInfos.handle(a->true,"name='修改后'");
+        baseInfos.handle(a->true,"name=1");
+//        ListFrame<Map<String,Object>> maps = baseInfos.toMap();
         System.out.println(baseInfos);
     }
 }

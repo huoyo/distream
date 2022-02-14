@@ -263,7 +263,11 @@ public class ExpressUtil {
                     keyField.set(param, Double.valueOf(value.toString()));
                 } else if ("Integer".equals(keyField.getType().getSimpleName())) {
                     keyField.set(param, Integer.valueOf(value.toString()));
-                } else {
+                } else if ("Float".equals(keyField.getType().getSimpleName())) {
+                    keyField.set(param, Float.valueOf(value.toString()));
+                }else if ("String".equals(keyField.getType().getSimpleName())) {
+                    keyField.set(param, value.toString());
+                }else {
                     keyField.set(param, value);
                 }
             } catch (IllegalAccessException e) {
