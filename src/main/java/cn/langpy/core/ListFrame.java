@@ -117,7 +117,7 @@ public class ListFrame<E> extends ArrayList<E> {
         return readMap(path, ",");
     }
 
-    public <T> ListFrame<T> toObject(Class<T> beanClass) {
+    public <T> ListFrame<T> toObjectList(Class<T> beanClass) {
         ListFrame<T> listFrame = new ListFrame<>();
         if (this.data==null) {
             return null;
@@ -139,7 +139,7 @@ public class ListFrame<E> extends ArrayList<E> {
         return listFrame;
     }
 
-    public ListFrame<Map<String,Object>> toMap() {
+    public ListFrame<Map<String,Object>> toMapList() {
         if (this.data==null) {
             return null;
         }
@@ -436,6 +436,10 @@ public class ListFrame<E> extends ArrayList<E> {
         return handle(a -> true, fun);
     }
 
+    public MapFrame<Object, ListFrame> groupBy(String... columnNames) {
+        // TODO: 2022-02-18  
+        return null;
+    }
     public MapFrame<Object, ListFrame> groupBy(String columnName) {
         MapFrame<Object, ListFrame> groupMap = new MapFrame<>();
 

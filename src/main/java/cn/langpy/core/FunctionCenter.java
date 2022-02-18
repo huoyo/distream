@@ -37,6 +37,9 @@ public class FunctionCenter {
     }
 
     private static Object format(Object value, OperateMap operateMap) {
+        if (value==null) {
+            return null;
+        }
         int d = (int) operateMap.getParams().get(1);
         BigDecimal bigDecimal = new BigDecimal((double) value);
         double doubleValue = bigDecimal.setScale(d, BigDecimal.ROUND_HALF_UP).doubleValue();
