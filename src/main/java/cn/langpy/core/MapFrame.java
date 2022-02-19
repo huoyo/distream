@@ -6,7 +6,6 @@ import java.util.Set;
 
 public class MapFrame<K, V> extends HashMap<K, V> {
 
-    /*MapFrame<Object, ListFrame> agesGroup = lines.groupBy("年龄");*/
     public MapFrame<K, MapFrame<Object,ListFrame>> groupBy(String column) {
         MapFrame<K,MapFrame<Object,ListFrame>> mapFrames = new MapFrame();
         Set<K> ks = this.keySet();
@@ -26,8 +25,8 @@ public class MapFrame<K, V> extends HashMap<K, V> {
         return mapFrames;
     }
 
-    public <T> Map<K, T> count() {
-        Map<K, T> mapInt = new HashMap<>();
+    public <T> MapFrame<K, T> count() {
+        MapFrame<K, T> mapInt = new MapFrame<>();
         Set<K> ks = this.keySet();
         for (K k : ks) {
             V v = get(k);
@@ -37,7 +36,7 @@ public class MapFrame<K, V> extends HashMap<K, V> {
                 mapInt.put(k, (T)size);
             } else if (v instanceof MapFrame) {
                 MapFrame<Object,ListFrame> vFrame = (MapFrame<Object,ListFrame>)v ;
-                Map<Object, Integer> count = vFrame.count();
+                MapFrame<Object, Integer> count = vFrame.count();
                 mapInt.put(k,(T)count);
             }
 
@@ -45,8 +44,8 @@ public class MapFrame<K, V> extends HashMap<K, V> {
         return mapInt;
     }
 
-    public <T> Map<K, T> sum(String sumColumn) {
-        Map<K, T> map = new HashMap<>();
+    public <T> MapFrame<K, T> sum(String sumColumn) {
+        MapFrame<K, T> map = new MapFrame<>();
         Set<K> ks = this.keySet();
         for (K k : ks) {
             V v = get(k);
@@ -56,25 +55,32 @@ public class MapFrame<K, V> extends HashMap<K, V> {
                 map.put(k, (T)sum);
             } else if (v instanceof MapFrame) {
                 MapFrame<Object,ListFrame> vFrame = (MapFrame<Object,ListFrame>)v ;
-                Map<Object, Double> sum = vFrame.sum(sumColumn);
+                MapFrame<Object, Double> sum = vFrame.sum(sumColumn);
                 map.put(k,(T)sum);
             }
         }
         return map;
     }
 
-    public Map<K, ListFrame> concat(String sumColumn) {
-        Map<K, ListFrame> map = new HashMap<>();
+    public <T> MapFrame<K, T> concat(String concatColumn) {
+        MapFrame<K, T> map = new MapFrame<K,T>();
         Set<K> ks = this.keySet();
         for (K k : ks) {
-            ListFrame v = (ListFrame) get(k);
-            map.put(k, v.get(sumColumn));
+            V v = get(k);
+            if (v instanceof ListFrame) {
+                ListFrame vFrame = (ListFrame)v ;
+                map.put(k, (T)vFrame.get(concatColumn));
+            } else if (v instanceof MapFrame) {
+                MapFrame<Object,ListFrame> vFrame = (MapFrame<Object,ListFrame>)v ;
+                MapFrame<Object, ListFrame> concat = vFrame.concat(concatColumn);
+                map.put(k,(T)concat);
+            }
         }
         return map;
     }
 
-    public <T> Map<K, T> avg(String sumColumn) {
-        Map<K, T> map = new HashMap<>();
+    public <T> MapFrame<K, T> avg(String sumColumn) {
+        MapFrame<K, T> map = new MapFrame<>();
         Set<K> ks = this.keySet();
         for (K k : ks) {
             V v = get(k);
@@ -84,7 +90,7 @@ public class MapFrame<K, V> extends HashMap<K, V> {
                 map.put(k, (T)avg);
             } else if (v instanceof MapFrame) {
                 MapFrame<Object,ListFrame> vFrame = (MapFrame<Object,ListFrame>)v ;
-                Map<Object, Double> avg = vFrame.avg(sumColumn);
+                MapFrame<Object, Double> avg = vFrame.avg(sumColumn);
                 map.put(k,(T)avg);
             }
         }
