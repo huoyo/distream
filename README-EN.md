@@ -14,11 +14,11 @@
 
 ```java
 lines = lines
-        .handle("value=format(value,2)")
+        .handle("value=format(value,2)") //round to the nearest hundredth
         .handle(line->line.getName()==null,"name=''") //if(line.getName()==null){line.setName('');}
-        .handle("name=replace(name,'#','')")
-        .handle("percent=value/"+sum)
-        .groupBy("name").sum("percent");
+        .handle("name=replace(name,'#','')") //replace '#' to ''
+        .handle("percent=double(value)/"+sum) //converting value's tyle to double and computing percent
+        .groupBy("name").sum("percent"); //groupBy 'name'
 ```
 
 * Read data easily by sql 
@@ -181,6 +181,8 @@ lines = lines.handle("name=substring(name,1,2)");
 
 /*replace "xxx" to "yyy"*/
 lines = lines.handle("name=replace(name,'xxx','yyy')");
+/*you can alse use '-' to replace if you only want to replace 'xxx' */
+lines = lines.handle("name=name-'xxx'");
 
 /*index like java indexof*/
 lines = lines.handle("id=index(name,'xxx')");
