@@ -129,8 +129,9 @@ Map<Object, Integer> count = agesGroup.count();
 Map<Object, Double> incomeAvg = agesGroup.avg("收入");
 Map<Object, Double> incomeSum = agesGroup.sum("收入");
 Map<Object, ListFrame> incomeConcat = agesGroup.concat("收入");
+/*continuous groupBy*/
+MapFrame<Object, MapFrame<Object, ListFrame>> incomeAgeConcat = lines.groupBy("收入").groupBy("年龄");
 ```
-
 ##### 5.Save data to a txt file
 
 ```java
