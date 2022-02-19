@@ -42,6 +42,39 @@ public class ExpressUtil {
 
     private static Pattern substringPattern = Pattern.compile("^substring\\(.+,\\s*[0-9]+,\\s*[0-9]+\\s*\\)$");
 
+    public static boolean canFormatNumber(Object value) {
+        if (value == null) {
+            return false;
+        }
+        if (canFormatInt(value)) {
+            return true;
+        }
+        if (canFormatDouble(value)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean canFormatInt(Object value) {
+        if (value == null) {
+            return false;
+        }
+        if (intPattern.matcher(value.toString()).find()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean canFormatDouble(Object value) {
+        if (value == null) {
+            return false;
+        }
+        if (intPattern.matcher(value.toString()).find()) {
+            return true;
+        }
+        return false;
+    }
+
     public static List<ExpressionMap> getOperates(String expresses) {
         List<ExpressionMap> ops = new ArrayList<>();
         String[] expressesSplit = expresses.split(";");
@@ -127,7 +160,7 @@ public class ExpressUtil {
             params.add(subStart);
             params.add(subEnd);
             leftOperateMap.setParams(params);
-        }  else if (toIntPattern.matcher(key).find()) {
+        } else if (toIntPattern.matcher(key).find()) {
             String newKey = key.substring(4, key.indexOf(")"));
             leftOperateMap.setParamType(ParamType.FUNCTION);
             leftOperateMap.setFunc(Functions.INT);
@@ -141,24 +174,23 @@ public class ExpressUtil {
             List<Object> params = new ArrayList<>();
             params.add(newKey);
             leftOperateMap.setParams(params);
-        }else if (toStringPattern.matcher(key).find()) {
+        } else if (toStringPattern.matcher(key).find()) {
             String newKey = key.substring(7, key.indexOf(")"));
             leftOperateMap.setParamType(ParamType.FUNCTION);
             leftOperateMap.setFunc(Functions.STRING);
             List<Object> params = new ArrayList<>();
             params.add(newKey);
             leftOperateMap.setParams(params);
-        }else if (indexPattern.matcher(key).find()) {
+        } else if (indexPattern.matcher(key).find()) {
             String newKey = key.substring(6, key.indexOf(","));
             String src = key.substring(key.indexOf(",") + 1, key.indexOf(")"));
             leftOperateMap.setParamType(ParamType.FUNCTION);
             leftOperateMap.setFunc(Functions.INDEX);
             List<Object> params = new ArrayList<>();
             params.add(newKey.trim());
-            params.add(src.trim().replace("'",""));
+            params.add(src.trim().replace("'", ""));
             leftOperateMap.setParams(params);
-        }
-        else {
+        } else {
             leftOperateMap.setParamType(ParamType.VARIABLE);
             List<Object> params = new ArrayList<>();
             params.add(key);
@@ -265,9 +297,9 @@ public class ExpressUtil {
                     keyField.set(param, Integer.valueOf(value.toString()));
                 } else if ("Float".equals(keyField.getType().getSimpleName())) {
                     keyField.set(param, Float.valueOf(value.toString()));
-                }else if ("String".equals(keyField.getType().getSimpleName())) {
+                } else if ("String".equals(keyField.getType().getSimpleName())) {
                     keyField.set(param, value.toString());
-                }else {
+                } else {
                     keyField.set(param, value);
                 }
             } catch (IllegalAccessException e) {

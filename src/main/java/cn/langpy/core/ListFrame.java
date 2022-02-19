@@ -220,6 +220,10 @@ public class ListFrame<E> extends ArrayList<E> {
         return readMap(path, splitBy, Arrays.stream(columnTypes).collect(Collectors.toList()));
     }
 
+    public static ListFrame<Map<String, Object>> readMap(String path, Class[] columnTypes) {
+        return readMap(path, ",", Arrays.stream(columnTypes).collect(Collectors.toList()));
+    }
+
     private static Object getTypeValue(Object v, Class<?> c) {
         if (c == Integer.class) {
             return Integer.valueOf(v.toString());

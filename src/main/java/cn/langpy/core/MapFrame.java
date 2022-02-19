@@ -62,6 +62,42 @@ public class MapFrame<K, V> extends HashMap<K, V> {
         return map;
     }
 
+    public <T> MapFrame<K, T> max(String maxColumn) {
+        MapFrame<K, T> map = new MapFrame<>();
+        Set<K> ks = this.keySet();
+        for (K k : ks) {
+            V v = get(k);
+            if (v instanceof ListFrame) {
+                ListFrame vFrame = (ListFrame)v ;
+                Object max = vFrame.get(maxColumn).max();
+                map.put(k, (T)max);
+            } else if (v instanceof MapFrame) {
+                MapFrame<Object,ListFrame> vFrame = (MapFrame<Object,ListFrame>)v ;
+                MapFrame max = vFrame.max(maxColumn);
+                map.put(k,(T)max);
+            }
+        }
+        return map;
+    }
+
+    public <T> MapFrame<K, T> min(String minColumn) {
+        MapFrame<K, T> map = new MapFrame<>();
+        Set<K> ks = this.keySet();
+        for (K k : ks) {
+            V v = get(k);
+            if (v instanceof ListFrame) {
+                ListFrame vFrame = (ListFrame)v ;
+                Object min = vFrame.get(minColumn).min();
+                map.put(k, (T)min);
+            } else if (v instanceof MapFrame) {
+                MapFrame<Object,ListFrame> vFrame = (MapFrame<Object,ListFrame>)v ;
+                MapFrame min = vFrame.min(minColumn);
+                map.put(k,(T)min);
+            }
+        }
+        return map;
+    }
+
     public <T> MapFrame<K, T> concat(String concatColumn) {
         MapFrame<K, T> map = new MapFrame<K,T>();
         Set<K> ks = this.keySet();
@@ -79,18 +115,18 @@ public class MapFrame<K, V> extends HashMap<K, V> {
         return map;
     }
 
-    public <T> MapFrame<K, T> avg(String sumColumn) {
+    public <T> MapFrame<K, T> avg(String avgColumn) {
         MapFrame<K, T> map = new MapFrame<>();
         Set<K> ks = this.keySet();
         for (K k : ks) {
             V v = get(k);
             if (v instanceof ListFrame) {
                 ListFrame vFrame = (ListFrame)v ;
-                Double avg = vFrame.get(sumColumn).avg();
+                Double avg = vFrame.get(avgColumn).avg();
                 map.put(k, (T)avg);
             } else if (v instanceof MapFrame) {
                 MapFrame<Object,ListFrame> vFrame = (MapFrame<Object,ListFrame>)v ;
-                MapFrame<Object, Double> avg = vFrame.avg(sumColumn);
+                MapFrame<Object, Double> avg = vFrame.avg(avgColumn);
                 map.put(k,(T)avg);
             }
         }

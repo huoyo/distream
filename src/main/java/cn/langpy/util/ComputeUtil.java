@@ -45,7 +45,11 @@ public class ComputeUtil {
             datum = setValue(leftKey, Double.valueOf(value1.toString()) * Integer.valueOf(value2.toString()), datum);
         } else if (value1 instanceof Double && value2 instanceof Double) {
             datum = setValue(leftKey, Double.valueOf(value1.toString()) * Double.valueOf(value2.toString()), datum);
-        } else {
+        } else if (ExpressUtil.canFormatInt(value1) && ExpressUtil.canFormatInt(value2)) {
+            datum = setValue(leftKey, Integer.valueOf(value1.toString()) * Integer.valueOf(value2.toString()), datum);
+        }else if (ExpressUtil.canFormatDouble(value1) && ExpressUtil.canFormatDouble(value2)) {
+            datum = setValue(leftKey, Double.valueOf(value1.toString()) * Double.valueOf(value2.toString()), datum);
+        }else {
             throw new RuntimeException("unknown data type:"+value1.getClass()+" and "+value2.getClass());
         }
         return datum;
@@ -60,8 +64,10 @@ public class ComputeUtil {
             datum = setValue(leftKey, Double.valueOf(value1.toString()) / Double.valueOf(value2.toString()), datum);
         } else if (value1 instanceof Double && value2 instanceof Double) {
             datum = setValue(leftKey, Double.valueOf(value1.toString()) / Double.valueOf(value2.toString()), datum);
+        } else if (ExpressUtil.canFormatNumber(value1) && ExpressUtil.canFormatNumber(value2)) {
+            datum = setValue(leftKey, Double.valueOf(value1.toString()) / Double.valueOf(value2.toString()), datum);
         } else {
-            throw new RuntimeException("unknown data type:"+value1.getClass()+" and "+value2.getClass());
+            throw new RuntimeException("unknown data type:" + value1.getClass() + " and " + value2.getClass());
         }
         return datum;
     }

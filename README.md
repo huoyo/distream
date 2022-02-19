@@ -5,7 +5,7 @@
 [英文文档/ENGLISH](README-EN.md)
 
 <div >
-    <img src='https://shields.io/badge/version-1.0.0-green.svg'>
+    <img src='https://shields.io/badge/version-1.0.3-green.svg'>
     <img src='https://shields.io/badge/author-Chang Zhang-dbab09.svg'>
     <h4>一个为Java语言开发的List扩展工具库，可用于list对象流式数据处理，包括自定义数据处理器、lambda表达式和等式计算等</h4>
 </div>
@@ -14,11 +14,11 @@
 
 ```java
 lines = lines
-        .handle("value=format(value,2)")
+        .handle("value=format(value,2)") //round to the nearest hundredth
         .handle(line->line.getName()==null,"name=''") //if(line.getName()==null){line.setName('');}
-        .handle("name=replace(name,'#','')")
-        .handle("percent=value/"+sum)
-        .groupBy("name").sum("percent");
+        .handle("name=replace(name,'#','')") //replace '#' to ''
+        .handle("percent=double(value)/"+sum) //converting value's tyle to double and computing percent
+        .groupBy("name").sum("percent"); //groupBy 'name'
 ```
 
 * 便携数据库读取
@@ -50,7 +50,7 @@ lines = list.readSql("select * from xxx").handle(a->...).handle(a->...)...;
  <dependency>
     <groupId>cn.langpy</groupId>
     <artifactId>distream</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
  </dependency>
 ```
 
@@ -91,7 +91,7 @@ lines = lines
 /*read by split symbol*/
 //ListFrame<Map<String, Object>> lines = ListFrame.readMap(path,",");
 /*define data types*/
-ListFrame<Map<String, Object>> lines = ListFrame.readMap(path,",",new Class[]{Integer.class,String.class,Integer.class,Double.class});
+ListFrame<Map<String, Object>> lines = ListFrame.readMap(path,new Class[]{Integer.class,String.class,Integer.class,Double.class});
 lines = lines
         .handle("收入=收入*0.8")
         .handle("序号='0'+序号;姓名=序号+姓名")//add "0" at the front of 序号;rename 姓名 by 序号+姓名
@@ -129,10 +129,12 @@ double avgIncome = indexs.avg();
 
 ```java
 MapFrame<Object, ListFrame> agesGroup = lines.groupBy("年龄");
-Map<Object, Integer> count = agesGroup.count();
-Map<Object, Double> incomeAvg = agesGroup.avg("收入");
-Map<Object, Double> incomeSum = agesGroup.sum("收入");
-Map<Object, ListFrame> incomeConcat = agesGroup.concat("收入");
+MapFrame<Object, Integer> count = agesGroup.count();
+MapFrame<Object, Double> incomeAvg = agesGroup.avg("收入");
+MapFrame<Object, Double> incomeSum = agesGroup.sum("收入");
+MapFrame<Object, ListFrame> incomeConcat = agesGroup.concat("收入");
+/*continuous groupBy*/
+MapFrame<Object, MapFrame<Object, ListFrame>> incomeAgeConcat = lines.groupBy("收入").groupBy("年龄");
 ```
 
 ##### 5.保存成文件
@@ -151,12 +153,13 @@ ListFrame<Object> lines = ListFrame.fromList(list);
 list = lines.toList();
 ```
 
-##### 7.Map转对象
+##### 7.Map与对象互转
 
 ```java
 
 ListFrame<Map> lines = ListFrame.readMap(path);
-ListFrame<User> users = lines.toObject(User.class);
+ListFrame<User> users = lines.toObjectList(User.class);
+ListFrame<Map> maps = users.toMapList();
 ```
 
 ##### 8.数据替换
@@ -185,6 +188,8 @@ lines = lines.handle("name=substring(name,1,2)");
 
 /*replace "xxx" to "yyy"*/
 lines = lines.handle("name=replace(name,'xxx','yyy')");
+/*you can alse use '-' to replace if you only want to replace 'xxx' */
+lines = lines.handle("name=name-'xxx'");
 
 /*index like java indexof*/
 lines = lines.handle("id=index(name,'xxx')");
