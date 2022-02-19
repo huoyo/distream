@@ -11,9 +11,17 @@ public class MapFrame<K, V> extends HashMap<K, V> {
         MapFrame<K,MapFrame<Object,ListFrame>> mapFrames = new MapFrame();
         Set<K> ks = this.keySet();
         for (K k : ks) {
-            ListFrame v = (ListFrame) get(k);
-            MapFrame<Object,ListFrame> mapFrame = v.groupBy(column);
-            mapFrames.put(k,mapFrame);
+            V v = get(k);
+            if (v instanceof ListFrame) {
+                ListFrame vFrame = (ListFrame) v;
+                MapFrame<Object,ListFrame> mapFrame = vFrame.groupBy(column);
+                mapFrames.put(k,mapFrame);
+            } else if (v instanceof MapFrame) {
+                MapFrame vFrame = (MapFrame) v;
+                MapFrame mapFrame = vFrame.groupBy(column);
+                mapFrames.put(k,mapFrame);
+            }
+
         }
         return mapFrames;
     }
