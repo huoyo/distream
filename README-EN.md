@@ -140,7 +140,7 @@ lines.toFile("save.txt");
 ```
 
 
-##### 6.convert data between List and ListFrame
+##### 6.Convert data between List and ListFrame
 
 ```java
 List<Object> list = ...;
@@ -148,12 +148,13 @@ ListFrame<Object> lines = ListFrame.fromList(list);
 list = lines.toList();
 ```
 
-##### 7.Convert Map to Object
+##### 7.Convert data between Map and Object
 
 ```java
 
 ListFrame<Map> lines = ListFrame.readMap(path);
-ListFrame<User> users = lines.toObject(User.class);
+ListFrame<User> users = lines.toObjectList(User.class);
+ListFrame<Map> maps = users.toMapList();
 ```
 
 ##### 8.Replace data
