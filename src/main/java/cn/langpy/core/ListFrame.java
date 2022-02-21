@@ -10,6 +10,8 @@ import javax.sql.DataSource;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -119,10 +121,10 @@ public class ListFrame<E> extends ArrayList<E> {
 
     public <T> ListFrame<T> toObjectList(Class<T> beanClass) {
         ListFrame<T> listFrame = new ListFrame<>();
-        if (this.data==null) {
+        if (this.data == null) {
             return null;
         }
-        if (this.data.size()==0) {
+        if (this.data.size() == 0) {
             return listFrame;
         }
         try {
@@ -139,21 +141,21 @@ public class ListFrame<E> extends ArrayList<E> {
         return listFrame;
     }
 
-    public ListFrame<Map<String,Object>> toMapList() {
-        if (this.data==null) {
+    public ListFrame<Map<String, Object>> toMapList() {
+        if (this.data == null) {
             return null;
         }
-        ListFrame<Map<String,Object>> listFrame = new ListFrame<>();
-        if (this.data.size()==0) {
+        ListFrame<Map<String, Object>> listFrame = new ListFrame<>();
+        if (this.data.size() == 0) {
             return listFrame;
         }
         E e1 = data.get(0);
         if (e1 instanceof Map) {
-            return (ListFrame<Map<String,Object>>)this.data;
+            return (ListFrame<Map<String, Object>>) this.data;
         }
         Field[] fields = data.get(0).getClass().getDeclaredFields();
         for (E datum : data) {
-            Map<String,Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
             for (Field field : fields) {
                 int mod = field.getModifiers();
                 if (Modifier.isStatic(mod) || Modifier.isFinal(mod)) {
@@ -161,7 +163,7 @@ public class ListFrame<E> extends ArrayList<E> {
                 }
                 try {
                     field.setAccessible(true);
-                    map.put(field.getName(),field.get(datum));
+                    map.put(field.getName(), field.get(datum));
                     field.setAccessible(false);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
@@ -282,10 +284,10 @@ public class ListFrame<E> extends ArrayList<E> {
 
     public <T> ListFrame<T> get(Function<E, T> fun) {
         ListFrame<T> listFrame = new ListFrame<>();
-        if (this.data==null) {
+        if (this.data == null) {
             return null;
         }
-        if (this.data.size()==0) {
+        if (this.data.size() == 0) {
             return listFrame;
         }
         Object o = data.get(0);
@@ -305,10 +307,10 @@ public class ListFrame<E> extends ArrayList<E> {
             return (ListFrame<T>) objects;
         }
         ListFrame<Object> listFrame = new ListFrame<>();
-        if (this.data==null) {
+        if (this.data == null) {
             return null;
         }
-        if (this.data.size()==0) {
+        if (this.data.size() == 0) {
             return new ListFrame<T>();
         }
         Object o = data.get(0);
@@ -328,6 +330,16 @@ public class ListFrame<E> extends ArrayList<E> {
             columnData.put(columnName, listFrame);
             return (ListFrame<T>) listFrame;
         }
+    }
+
+    public <T> ListFrame<T> distinct() {
+        ListFrame<T> listFrame = new ListFrame<>();
+        for (E datum : data) {
+            if (!listFrame.contains(datum)) {
+                listFrame.add((T) datum);
+            }
+        }
+        return listFrame;
     }
 
     public ListFrame<E> replace(String src, String tar) {
@@ -440,10 +452,6 @@ public class ListFrame<E> extends ArrayList<E> {
         return handle(a -> true, fun);
     }
 
-    public MapFrame<Object, ListFrame> groupBy(String... columnNames) {
-        // TODO: 2022-02-18  
-        return null;
-    }
     public MapFrame<Object, ListFrame> groupBy(String columnName) {
         MapFrame<Object, ListFrame> groupMap = new MapFrame<>();
 
@@ -599,6 +607,55 @@ public class ListFrame<E> extends ArrayList<E> {
             sum += a;
         }
         return sum;
+    }
+
+
+    public ListFrame<Double> asDouble() {
+        ListFrame<Double> listFrame = new ListFrame<Double>();
+        for (E datum : data) {
+            if (datum instanceof Double) {
+                listFrame.add((Double) datum);
+            } else {
+                listFrame.add(Double.valueOf(datum + ""));
+            }
+        }
+        return listFrame;
+    }
+
+    public ListFrame<Float> asFloat() {
+        ListFrame<Float> listFrame = new ListFrame<Float>();
+        for (E datum : data) {
+            if (datum instanceof Float) {
+                listFrame.add((Float) datum);
+            } else {
+                listFrame.add(Float.valueOf(datum + ""));
+            }
+        }
+        return listFrame;
+    }
+
+    public ListFrame<Integer> asInteger() {
+        ListFrame<Integer> listFrame = new ListFrame<Integer>();
+        for (E datum : data) {
+            if (datum instanceof Integer) {
+                listFrame.add((Integer) datum);
+            } else {
+                listFrame.add(Integer.valueOf(datum + ""));
+            }
+        }
+        return listFrame;
+    }
+
+    public ListFrame<String> asString() {
+        ListFrame<String> listFrame = new ListFrame<String>();
+        for (E datum : data) {
+            if (datum instanceof String) {
+                listFrame.add((String) datum);
+            } else {
+                listFrame.add(datum + "");
+            }
+        }
+        return listFrame;
     }
 
 
