@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -96,12 +97,12 @@ public class ListFrame<E> extends ArrayList<E> {
         return DataBaseUtil.readSql(sql, config);
     }
 
-    public static ListFrame<String> readString(String path) {
+    public static ListFrame<String> readString(String path, Charset charset) {
         File file = new File(path);
         ListFrame<String> listFrame = new ListFrame();
         try (
                 FileInputStream fileInputStream = new FileInputStream(file);
-                InputStreamReader streamReader = new InputStreamReader(fileInputStream);
+                InputStreamReader streamReader = new InputStreamReader(fileInputStream, charset);
                 BufferedReader br = new BufferedReader(streamReader)
         ) {
             String line = "";
@@ -115,8 +116,16 @@ public class ListFrame<E> extends ArrayList<E> {
         return listFrame;
     }
 
+    public static ListFrame<String> readString(String path) {
+        return readString(path, Charset.defaultCharset());
+    }
+
     public static ListFrame<Map<String, Object>> readMap(String path) {
         return readMap(path, ",");
+    }
+
+    public static ListFrame<Map<String, Object>> readMap(String path, Charset charset) {
+        return readMap(path, ",", charset);
     }
 
     public <T> ListFrame<T> toObjectList(Class<T> beanClass) {
@@ -188,12 +197,12 @@ public class ListFrame<E> extends ArrayList<E> {
         return object;
     }
 
-    public static ListFrame<Map<String, Object>> readMap(String path, String splitBy, List<Class> columnTypes) {
+    public static ListFrame<Map<String, Object>> readMap(String path, String splitBy, List<Class> columnTypes, Charset charset) {
         File file = new File(path);
         ListFrame<Map<String, Object>> listFrame = new ListFrame();
         try (
                 FileInputStream fileInputStream = new FileInputStream(file);
-                InputStreamReader streamReader = new InputStreamReader(fileInputStream);
+                InputStreamReader streamReader = new InputStreamReader(fileInputStream, charset);
                 BufferedReader br = new BufferedReader(streamReader)
         ) {
 
@@ -218,12 +227,20 @@ public class ListFrame<E> extends ArrayList<E> {
         return listFrame;
     }
 
+    public static ListFrame<Map<String, Object>> readMap(String path, String splitBy, Class[] columnTypes, Charset charset) {
+        return readMap(path, splitBy, Arrays.stream(columnTypes).collect(Collectors.toList()), charset);
+    }
+
     public static ListFrame<Map<String, Object>> readMap(String path, String splitBy, Class[] columnTypes) {
-        return readMap(path, splitBy, Arrays.stream(columnTypes).collect(Collectors.toList()));
+        return readMap(path, splitBy, Arrays.stream(columnTypes).collect(Collectors.toList()), Charset.defaultCharset());
+    }
+
+    public static ListFrame<Map<String, Object>> readMap(String path, Class[] columnTypes, Charset charset) {
+        return readMap(path, ",", Arrays.stream(columnTypes).collect(Collectors.toList()), charset);
     }
 
     public static ListFrame<Map<String, Object>> readMap(String path, Class[] columnTypes) {
-        return readMap(path, ",", Arrays.stream(columnTypes).collect(Collectors.toList()));
+        return readMap(path, ",", Arrays.stream(columnTypes).collect(Collectors.toList()), Charset.defaultCharset());
     }
 
     private static Object getTypeValue(Object v, Class<?> c) {
@@ -241,11 +258,15 @@ public class ListFrame<E> extends ArrayList<E> {
 
 
     public static ListFrame<Map<String, Object>> readMap(String path, String splitBy) {
+        return readMap(path, splitBy, Charset.defaultCharset());
+    }
+
+    public static ListFrame<Map<String, Object>> readMap(String path, String splitBy, Charset charset) {
         File file = new File(path);
         ListFrame<Map<String, Object>> listFrame = new ListFrame();
         try (
                 FileInputStream fileInputStream = new FileInputStream(file);
-                InputStreamReader streamReader = new InputStreamReader(fileInputStream);
+                InputStreamReader streamReader = new InputStreamReader(fileInputStream, charset);
                 BufferedReader br = new BufferedReader(streamReader)
         ) {
 
@@ -413,6 +434,27 @@ public class ListFrame<E> extends ArrayList<E> {
 
     public ListFrame<E> handle(DataHandlerInterface<E> dataProcess) {
         return handle(a -> true, dataProcess);
+    }
+
+    public ListFrame<E> handle(Predicate<E> condition, String ifExpressions,String elseExpressions) {
+        List<ExpressionMap> ifOps = ExpressUtil.getOperates(ifExpressions);
+        List<ExpressionMap> elseOps = ExpressUtil.getOperates(elseExpressions);
+        ListFrame<E> numFrame = new ListFrame<E>();
+        for (E datum : data) {
+            for (ExpressionMap op : ifOps) {
+                if (condition.test(datum)) {
+                    datum = ExpressUtil.operate(datum, op);
+                }
+            }
+            for (ExpressionMap op : elseOps) {
+                if (!condition.test(datum)) {
+                    datum = ExpressUtil.operate(datum, op);
+                }
+            }
+            numFrame.add(datum);
+        }
+        numFrame.setColumns(data.getColumns());
+        return numFrame;
     }
 
     public ListFrame<E> handle(Predicate<E> condition, String expressions) {

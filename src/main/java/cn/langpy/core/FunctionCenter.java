@@ -40,11 +40,20 @@ public class FunctionCenter {
         if (value==null) {
             return null;
         }
+
+        double doubleValue = (double) value;
+        if (Double.isNaN(doubleValue)) {
+            return 0.0;
+        }
+        if (doubleValue==0.0) {
+            return doubleValue;
+        }
         int d = (int) operateMap.getParams().get(1);
-        BigDecimal bigDecimal = new BigDecimal((double) value);
-        double doubleValue = bigDecimal.setScale(d, BigDecimal.ROUND_HALF_UP).doubleValue();
+        BigDecimal bigDecimal = new BigDecimal(doubleValue);
+        doubleValue = bigDecimal.setScale(d, BigDecimal.ROUND_HALF_UP).doubleValue();
         return doubleValue;
     }
+
 
     private static Object toInt(Object value, OperateMap operateMap) {
         if (value==null) {
