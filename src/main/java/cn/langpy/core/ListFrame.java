@@ -436,7 +436,7 @@ public class ListFrame<E> extends ArrayList<E> {
         return handle(a -> true, dataProcess);
     }
 
-    public ListFrame<E> handle(Predicate<E> condition, String ifExpressions,String elseExpressions) {
+    public ListFrame<E> handle(Predicate<E> condition, String ifExpressions, String elseExpressions) {
         List<ExpressionMap> ifOps = ExpressUtil.getOperates(ifExpressions);
         List<ExpressionMap> elseOps = ExpressUtil.getOperates(elseExpressions);
         ListFrame<E> numFrame = new ListFrame<E>();
@@ -736,6 +736,20 @@ public class ListFrame<E> extends ArrayList<E> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public double variance() {
+        double avg = this.avg();
+        double sum = 0.0;
+        for (E datum : data) {
+            double a = Double.valueOf(datum + "");
+            sum += Math.pow(a - avg, 2);
+        }
+        return sum / data.size();
+    }
+
+    public double standardDeviation() {
+        return Math.sqrt(variance());
     }
 
 }
