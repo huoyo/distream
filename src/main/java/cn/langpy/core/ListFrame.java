@@ -10,14 +10,13 @@ import javax.sql.DataSource;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class ListFrame<E> extends ArrayList<E> {
@@ -136,17 +135,32 @@ public class ListFrame<E> extends ArrayList<E> {
         if (this.data.size() == 0) {
             return listFrame;
         }
-        try {
-            for (E datum : data) {
-                Map map = (Map) datum;
-                T object = mapToObject(map, beanClass);
-                listFrame.add(object);
+        E e1 = data.get(0);
+        if (e1 instanceof Map) {
+            try {
+                for (E datum : data) {
+                    Map map = (Map) datum;
+                    T object = mapToObject(map, beanClass);
+                    listFrame.add(object);
+                }
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
             }
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        } else {
+            try {
+                for (E datum : data) {
+                    T object = objectToObject(datum, beanClass);
+                    listFrame.add(object);
+                }
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
+
         return listFrame;
     }
 
@@ -193,6 +207,30 @@ public class ListFrame<E> extends ArrayList<E> {
             }
             field.setAccessible(true);
             field.set(object, map.get(field.getName()));
+        }
+        return object;
+    }
+
+    private static <T> T objectToObject(Object map, Class<T> beanClass) throws IllegalAccessException, InstantiationException {
+        T object = beanClass.newInstance();
+        Field[] fields = object.getClass().getDeclaredFields();
+
+        Field[] targetFields = map.getClass().getDeclaredFields();
+
+        for (Field field : fields) {
+            int mod = field.getModifiers();
+            if (Modifier.isStatic(mod) || Modifier.isFinal(mod)) {
+                continue;
+            }
+            field.setAccessible(true);
+            Optional<Field> keyFieldOption = Arrays.stream(targetFields).filter(name -> name.getName().equals(field.getName())).findFirst();
+            if (keyFieldOption.isPresent()) {
+                Field field1 = keyFieldOption.get();
+                field1.setAccessible(true);
+                field.set(object, field1.get(map));
+                field1.setAccessible(false);
+            }
+            field.setAccessible(false);
         }
         return object;
     }
@@ -752,4 +790,15 @@ public class ListFrame<E> extends ArrayList<E> {
         return Math.sqrt(variance());
     }
 
+    public MapFrame<E, Integer> frequency() {
+        MapFrame<E, Integer> mapFrame = new MapFrame<>();
+        for (E datum : data) {
+            if (mapFrame.containsKey(datum)) {
+                mapFrame.put(datum, mapFrame.get(datum) + 1);
+            } else {
+                mapFrame.put(datum, 1);
+            }
+        }
+        return mapFrame;
+    }
 }
