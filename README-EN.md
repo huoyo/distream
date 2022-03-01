@@ -50,7 +50,7 @@ lines = list.readSql("select * from xxx").handle(a->...).handle(a->...)...;
  <dependency>
     <groupId>cn.langpy</groupId>
     <artifactId>distream</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
  </dependency>
 ```
 
