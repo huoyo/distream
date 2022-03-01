@@ -125,6 +125,11 @@ ListFrame<Double> indexs = lines.get("收入");
 double maxIncome = indexs.max();
 double minIncome = indexs.min();
 double avgIncome = indexs.avg();
+/*the index of max*/
+int argmax= listFrame.argmax();
+/*the index of min*/
+int argmin= listFrame.argmin();
+
 ```
 
 ##### 4.分组求和
@@ -171,7 +176,39 @@ ListFrame<Map> maps = users.toMapList();
 lines = lines.replace("需要替换的列","xxx","yyy");
 ```
 
-##### 9.常用函数
+##### 9.类型转化
+
+```java
+List<String> list = Arrays.asList("1","2","3","4");
+ListFrame<Integer> listFrame = ListFrame.fromList(list );
+ListFrame<Integer> listInt= listFrame.asInteger();
+ListFrame<Double> listDouble= listFrame.asDouble();
+ListFrame<Float> listFloat= listFrame.asFloat();
+ListFrame<String> listString= listFloat.asString();
+
+```
+
+##### 10.统计元素个数
+
+```java
+List<Integer> list = Arrays.asList(2,2,2,4);
+MapFrame<Integer,Integer> listFrame = ListFrame.fromList(list).frequency()
+/*得到map {2=3,4=1}*/
+
+```
+
+##### 11.方差和标准差
+
+```java
+List<Integer> list = Arrays.asList(2,2,2,4);
+ListFrame<Integer> listFrame = ListFrame.fromList(list );
+listFrame.variance();//方差
+listFrame.standardDeviation();//标准差
+
+```
+
+
+##### 12.常用函数
 
 ```java
 
