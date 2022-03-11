@@ -849,4 +849,14 @@ public class ListFrame<E> extends ArrayList<E> {
         }
         return mapFrame;
     }
+
+    public <T> ListFrame<T> dropNull() {
+        ListFrame<T> listFrame = new ListFrame<>();
+        for (E datum : data) {
+            if (datum!=null) {
+                listFrame.add((T) datum);
+            }
+        }
+        return listFrame;
+    }
 }
