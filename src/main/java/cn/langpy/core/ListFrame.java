@@ -344,7 +344,7 @@ public class ListFrame<E> extends ArrayList<E> {
     public <T> ListFrame<T> get(Function<E, T> fun) {
         ListFrame<T> listFrame = new ListFrame<>();
         if (this.data == null) {
-            return null;
+            return new ListFrame<>();
         }
         if (this.data.size() == 0) {
             return listFrame;
@@ -367,7 +367,7 @@ public class ListFrame<E> extends ArrayList<E> {
         }
         ListFrame<Object> listFrame = new ListFrame<>();
         if (this.data == null) {
-            return null;
+            return new ListFrame<>();
         }
         if (this.data.size() == 0) {
             return new ListFrame<T>();
@@ -567,11 +567,17 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public int argmax() {
+        if (data==null || data.get(0)==null) {
+            return 0;
+        }
         if (doublePattern.matcher(data.get(0).toString()).find()) {
             Double max = 0.0;
             int index = 0;
             int n = 0;
             for (E datum : data) {
+                if (datum==null) {
+                    continue;
+                }
                 double a = Double.valueOf(datum + "");
                 if (a > max) {
                     max = a;
@@ -585,6 +591,9 @@ public class ListFrame<E> extends ArrayList<E> {
             int index = 0;
             int n = 0;
             for (E datum : data) {
+                if (datum==null) {
+                    continue;
+                }
                 int a = Integer.valueOf(datum + "");
                 if (a > max) {
                     max = a;
@@ -597,9 +606,15 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public <T> T max() {
+        if (data==null || data.get(0)==null) {
+            return null;
+        }
         if (doublePattern.matcher(data.get(0).toString()).find()) {
-            Double max = 0.0;
+            Double max = Double.MIN_VALUE;
             for (E datum : data) {
+                if (datum==null) {
+                    continue;
+                }
                 double a = Double.valueOf(datum + "");
                 if (a > max) {
                     max = a;
@@ -609,6 +624,9 @@ public class ListFrame<E> extends ArrayList<E> {
         } else {
             Integer max = 0;
             for (E datum : data) {
+                if (datum==null) {
+                    continue;
+                }
                 int a = Integer.valueOf(datum + "");
                 if (a > max) {
                     max = a;
@@ -620,11 +638,17 @@ public class ListFrame<E> extends ArrayList<E> {
 
 
     public int argmin() {
+        if (data==null || data.get(0)==null) {
+            return 0;
+        }
         if (doublePattern.matcher(data.get(0).toString()).find()) {
             Double max = Double.MAX_VALUE;
             int index = 0;
             int n = 0;
             for (E datum : data) {
+                if (datum==null) {
+                    continue;
+                }
                 double a = Double.valueOf(datum + "");
                 if (a < max) {
                     max = a;
@@ -638,6 +662,9 @@ public class ListFrame<E> extends ArrayList<E> {
             int index = 0;
             int n = 0;
             for (E datum : data) {
+                if (datum==null) {
+                    continue;
+                }
                 int a = Integer.valueOf(datum + "");
                 if (a < max) {
                     max = a;
@@ -650,9 +677,15 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public <T> T min() {
+        if (data==null || data.get(0)==null) {
+            return null;
+        }
         if (doublePattern.matcher(data.get(0).toString()).find()) {
             Double max = Double.MAX_VALUE;
             for (E datum : data) {
+                if (datum==null) {
+                    continue;
+                }
                 double a = Double.valueOf(datum + "");
                 if (a < max) {
                     max = a;
@@ -662,6 +695,9 @@ public class ListFrame<E> extends ArrayList<E> {
         } else {
             Integer max = Integer.MAX_VALUE;
             for (E datum : data) {
+                if (datum==null) {
+                    continue;
+                }
                 int a = Integer.valueOf(datum + "");
                 if (a < max) {
                     max = a;
@@ -672,8 +708,14 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public double avg() {
+        if (data==null || data.get(0)==null) {
+            return 0.0;
+        }
         double sum = 0.0;
         for (E datum : data) {
+            if (datum==null) {
+                continue;
+            }
             double a = Double.valueOf(datum + "");
             sum += a;
         }
@@ -681,8 +723,14 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public double sum() {
+        if (data==null || data.get(0)==null) {
+            return 0.0;
+        }
         double sum = 0.0;
         for (E datum : data) {
+            if (datum==null) {
+                continue;
+            }
             double a = Double.valueOf(datum + "");
             sum += a;
         }
