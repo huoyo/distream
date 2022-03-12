@@ -18,9 +18,13 @@ import java.util.regex.Pattern;
 public class ExpressUtil {
     public static Logger log = Logger.getLogger(ExpressUtil.class.toString());
 
+    private static Pattern subOperateSymbol = Pattern.compile(".*'.*-+.*'.*");
+
     private static Map<String, Field> fieldMap = new ConcurrentHashMap<>();
 
     private static Pattern operatePattern = Pattern.compile("[-+*/]+");
+
+    private static Pattern operatePattern_ = Pattern.compile("[+*/]+");
 
     private static Pattern stringPattern = Pattern.compile("^'.*'$");
 
@@ -83,12 +87,23 @@ public class ExpressUtil {
             String leftKey = expressSplit[0].trim();
             String rights = expressSplit[1].trim();
             String[] rightsSplit = rights.split("[-+*/]+");
+            if (subOperateSymbol.matcher(rights).find()) {
+                rightsSplit = rights.split("[+*/]+");
+            }else {
+                rightsSplit = rights.split("[-+*/]+");
+            }
+
             String operateKey1 = rightsSplit[0].trim();
             String operateKey2 = null;
             if (rightsSplit.length > 1) {
                 operateKey2 = rightsSplit[1].trim();
             }
-            Matcher m = operatePattern.matcher(express);//
+            Matcher m = null;
+            if (subOperateSymbol.matcher(express).find()) {
+                m = operatePattern_.matcher(express);
+            }else {
+                m = operatePattern.matcher(express);
+            }
             String operater = "AAAA";
             if (m.find()) {
                 operater = m.group();
