@@ -165,7 +165,65 @@ ListFrame<Map> maps = users.toMapList();
 lines = lines.replace("需要替换的列","xxx","yyy");
 ```
 
-##### 9.Common functions
+
+##### 9.Convert types
+
+```java
+List<String> list = Arrays.asList("1","2","3","4");
+ListFrame<Integer> listFrame = ListFrame.fromList(list );
+ListFrame<Integer> listInt= listFrame.asInteger();
+ListFrame<Double> listDouble= listFrame.asDouble();
+ListFrame<Float> listFloat= listFrame.asFloat();
+ListFrame<String> listString= listFloat.asString();
+
+```
+
+##### 10.Elements's frequencies
+
+```java
+List<Integer> list = Arrays.asList(2,2,2,4);
+MapFrame<Integer,Integer> listFrame = ListFrame.fromList(list).frequency()
+/*map {2=3,4=1}*/
+
+```
+
+##### 11.Variance and standardDeviation
+
+```java
+List<Integer> list = Arrays.asList(2,2,2,4);
+ListFrame<Integer> listFrame = ListFrame.fromList(list );
+listFrame.variance();//方差
+listFrame.standardDeviation();//标准差
+
+```
+
+
+##### 12.Remove the null
+
+如果一个list中存在为null的存在需要遍历剔除，可以直接使用如下函数：
+
+```java
+List<Integer> list = Arrays.asList(2,null,2,null,6);
+ListFrame<Integer> listFrame = ListFrame.fromList(list );
+listFrame = listFrame.dropNull();
+
+//[2,null,2,null,6]->[2,2,6]
+
+```
+
+##### 13.Remove the repeated
+
+
+```java
+List<Integer> list = Arrays.asList(2,2,2,6,6);
+ListFrame<Integer> listFrame = ListFrame.fromList(list );
+listFrame = listFrame.distinct();
+//[2,2,2,6,6]->[2,6]
+
+```
+
+
+##### 14.Common functions
 
 ```java
 /*replace "xxx" to "yyy"*/

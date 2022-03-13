@@ -208,7 +208,33 @@ listFrame.standardDeviation();//标准差
 ```
 
 
-##### 12.常用函数
+##### 12.剔除null值
+
+如果一个list中存在为null的存在需要遍历剔除，可以直接使用如下函数：
+
+```java
+List<Integer> list = Arrays.asList(2,null,2,null,6);
+ListFrame<Integer> listFrame = ListFrame.fromList(list );
+listFrame = listFrame.dropNull();
+
+//[2,null,2,null,6]->[2,2,6]
+
+```
+
+##### 13.去重
+
+
+```java
+List<Integer> list = Arrays.asList(2,2,2,6,6);
+ListFrame<Integer> listFrame = ListFrame.fromList(list );
+listFrame = listFrame.distinct();
+
+//[2,2,2,6,6]->[2,6]
+
+```
+
+
+##### 14.常用函数
 
 ```java
 
