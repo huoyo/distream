@@ -200,7 +200,6 @@ listFrame.standardDeviation();//标准差
 
 ##### 12.Remove the null
 
-如果一个list中存在为null的存在需要遍历剔除，可以直接使用如下函数：
 
 ```java
 List<Integer> list = Arrays.asList(2,null,2,null,6);
