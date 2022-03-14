@@ -113,6 +113,15 @@ public class MapHandler implements DataHandler<Map<String, Object>> {
 }
 ```
 
+也可以简写为：
+
+```java
+lines = lines(map->{
+  map.put("newKey",1);
+  return map;
+});
+```
+
 ##### 3.按列获取数据
 
 按列读取数据并求最大最小值以及平均值

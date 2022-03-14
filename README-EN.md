@@ -108,6 +108,15 @@ public class MapHandler implements DataHandler<Map<String, Object>> {
 }
 ```
 
+You can also use DataHandler like :
+
+```java
+lines = lines(map->{
+  map.put("newKey",1);
+  return map;
+});
+```
+
 ##### 3.Obtain data by a column name
 
 compute max,min and avg;
