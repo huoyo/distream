@@ -402,8 +402,8 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public ListFrame<E> replace(String src, String tar) {
-        if (data.size() == 0) {
-            return data;
+        if (data==null ||data.size()==0 ) {
+            return new ListFrame<E>();
         }
         Object o = data.get(0);
         if (o instanceof String) {
@@ -430,8 +430,8 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public ListFrame<E> replace(String column, String src, String tar) {
-        if (data.size() == 0) {
-            return data;
+        if (data==null ||data.size()==0 ) {
+            return new ListFrame<E>();
         }
         Object o = data.get(0);
         if (o instanceof String) {
@@ -458,6 +458,9 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public ListFrame<E> handle(Predicate<E> condition, DataHandlerInterface<E> dataProcess) {
+        if (data==null ||data.size()==0 ) {
+            return new ListFrame<E>();
+        }
         ListFrame<E> numFrame = new ListFrame<E>();
         for (E datum : data) {
             if (condition.test(datum)) {
@@ -475,6 +478,9 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public ListFrame<E> handle(Predicate<E> condition, String ifExpressions, String elseExpressions) {
+        if (data==null ||data.size()==0 ) {
+            return new ListFrame<E>();
+        }
         List<ExpressionMap> ifOps = ExpressUtil.getOperates(ifExpressions);
         List<ExpressionMap> elseOps = ExpressUtil.getOperates(elseExpressions);
         ListFrame<E> numFrame = new ListFrame<E>();
@@ -496,6 +502,9 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public ListFrame<E> handle(Predicate<E> condition, String expressions) {
+        if (data==null ||data.size()==0 ) {
+            return new ListFrame<E>();
+        }
         List<ExpressionMap> ops = ExpressUtil.getOperates(expressions);
         ListFrame<E> numFrame = new ListFrame<E>();
         for (E datum : data) {
@@ -516,6 +525,9 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public <T> ListFrame<T> handle(Predicate<E> condition, Function<E, T> fun) {
+        if (data==null ||data.size()==0 ) {
+            return new ListFrame<T>();
+        }
         ListFrame<T> numFrame = new ListFrame<T>();
         for (E datum : data) {
             if (condition.test(datum)) {
@@ -533,6 +545,9 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public MapFrame<Object, ListFrame> groupBy(String columnName) {
+        if (data==null ||data.size()==0) {
+            return new MapFrame<>();
+        }
         MapFrame<Object, ListFrame> groupMap = new MapFrame<>();
 
         Object o = data.get(0);
@@ -567,7 +582,7 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public int argmax() {
-        if (data==null || data.get(0)==null) {
+        if (data==null ||data.size()==0) {
             return 0;
         }
         if (doublePattern.matcher(data.get(0).toString()).find()) {
@@ -606,7 +621,7 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public <T> T max() {
-        if (data==null || data.get(0)==null) {
+        if (data==null ||data.size()==0) {
             return null;
         }
         if (doublePattern.matcher(data.get(0).toString()).find()) {
@@ -638,7 +653,7 @@ public class ListFrame<E> extends ArrayList<E> {
 
 
     public int argmin() {
-        if (data==null || data.get(0)==null) {
+        if (data==null ||data.size()==0 ) {
             return 0;
         }
         if (doublePattern.matcher(data.get(0).toString()).find()) {
@@ -677,7 +692,7 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public <T> T min() {
-        if (data==null || data.get(0)==null) {
+        if (data==null ||data.size()==0) {
             return null;
         }
         if (doublePattern.matcher(data.get(0).toString()).find()) {
@@ -708,7 +723,7 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public double avg() {
-        if (data==null || data.get(0)==null) {
+        if (data==null ||data.size()==0) {
             return 0.0;
         }
         double sum = 0.0;
@@ -723,7 +738,7 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public double sum() {
-        if (data==null || data.get(0)==null) {
+        if (data==null ||data.size()==0) {
             return 0.0;
         }
         double sum = 0.0;

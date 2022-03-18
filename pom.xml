@@ -6,7 +6,7 @@
 
     <groupId>cn.langpy</groupId>
     <artifactId>distream</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <dependencies>
         <dependency>
             <groupId>com.alibaba</groupId>
