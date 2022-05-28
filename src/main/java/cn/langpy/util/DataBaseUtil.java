@@ -50,9 +50,7 @@ public class DataBaseUtil {
 
     public static ListFrame<Map<String, Object>> readSql(String sql, DataSource dataSource) {
         ListFrame<Map<String, Object>> listFrame = new ListFrame<>();
-        PreparedStatement statement;
-        try (Connection connection = dataSource.getConnection()) {
-            statement = connection.prepareStatement(sql);
+        try (Connection connection = dataSource.getConnection();PreparedStatement statement=connection.prepareStatement(sql)) {
             final ResultSetMetaData metaData = statement.getMetaData();
             ResultSet resultSet = statement.executeQuery(sql);
             List<TableInfo> columns = getColumns(metaData);
@@ -63,6 +61,7 @@ public class DataBaseUtil {
                 }
                 listFrame.add(map);
             }
+
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
