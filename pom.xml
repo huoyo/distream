@@ -6,16 +6,16 @@
 
     <groupId>cn.langpy</groupId>
     <artifactId>distream</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <dependencies>
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
-            <version>1.1.10</version>
+            <version>1.2.10</version>
         </dependency>
     </dependencies>
     <name>distream</name>
-    <description>a extended tool of List about how to process data by lambda,expressions and custom class</description>
+    <description>an extended tool of List about how to process data by lambda,expressions and custom class</description>
     <licenses>
         <license>
             <name>Apache License</name>
