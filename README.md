@@ -5,7 +5,7 @@
 [英文文档/ENGLISH](README-EN.md)
 
 <div >
-    <img src='https://shields.io/badge/version-1.0.4-green.svg'>
+    <img src='https://shields.io/badge/version-1.0.9-green.svg'>
     <img src='https://shields.io/badge/author-Chang Zhang-dbab09.svg'>
     <h4>一个为Java语言开发的List扩展工具库，可用于list对象流式数据处理，包括自定义数据处理器、lambda表达式和等式计算等</h4>
 </div>
@@ -52,7 +52,7 @@ lines = list.readSql("select * from xxx").handle(a->...).handle(a->...)...;
  <dependency>
     <groupId>cn.langpy</groupId>
     <artifactId>distream</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
  </dependency>
 ```
 
