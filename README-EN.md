@@ -1,11 +1,12 @@
-# distream
-
+<div align="center">
+    <h1 >Distream</h1>  
+</div>
 ---
 
 [中文文档/CHINESE](README.md)
 
 <div >
-    <img src='https://shields.io/badge/version-1.0.9-green.svg'>
+    <img src='https://shields.io/badge/version-1.1.0-green.svg'>
     <img src='https://shields.io/badge/author-Chang Zhang-dbab09.svg'>
     <h4>An extended tool of List about how to process data by lambda,expressions and custom class.</h4>
 </div>
