@@ -35,6 +35,18 @@ lines = lines
         .groupBy("name").sum("percent"); //groupBy 'name'
 ```
 
+* 更推荐的写法（v1.1.0支持，性能最好）
+
+
+```java
+lines = lines
+        .addHandler(new DataHandler1()) 
+        .addHandler(new DataHandler2()) 
+        .addHandler(new DataHandler3()) 
+        .addHandler(new DataHandler4()) 
+        .execute();
+//DataHandler1、2、3、4需要实现DataHandler接口
+```
 
 * 便携数据库读取
 
