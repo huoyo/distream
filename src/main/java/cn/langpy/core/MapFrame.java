@@ -1,10 +1,11 @@
 package cn.langpy.core;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class MapFrame<K, V> extends HashMap<K, V> {
+public class MapFrame<K, V> extends LinkedHashMap<K, V> {
 
     public MapFrame<K, MapFrame<Object,ListFrame>> groupBy(String column) {
         MapFrame<K,MapFrame<Object,ListFrame>> mapFrames = new MapFrame();

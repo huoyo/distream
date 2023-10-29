@@ -9,8 +9,6 @@
         <module name="distream" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="distream" target="1.8" />
-    </bytecodeTargetLevel>
+    <bytecodeTargetLevel target="8" />
   </component>
 </project>

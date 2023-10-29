@@ -12,19 +12,19 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 public class ListFrame<E> extends ArrayList<E> {
     private static Pattern doublePattern = Pattern.compile("^[0-9]+\\.[0-9]+$");
 
     DataSource dataSource = null;
-    ListFrame<E> data = null;
-    Map<String, ListFrame<Object>> columnData = new LinkedHashMap<>();
+    private ListFrame<E> data = null;
+    private Map<String, ListFrame<Object>> columnData = new LinkedHashMap<>();
 
     private Map<String, ListFrame<Object>> getColumnData() {
         return columnData;
@@ -34,7 +34,9 @@ public class ListFrame<E> extends ArrayList<E> {
         this.columnData = columnData;
     }
 
-    private List<String> columns;
+    private List<String> columns = new ArrayList<>();
+    private static List<DataHandlerInterface> dataHandlers = new ArrayList<>();
+    private static List<String> expHandlers = new ArrayList<>();
 
     public List<String> getColumns() {
         return columns;
@@ -45,10 +47,6 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
 
-    public ListFrame(int initialCapacity) {
-        super(initialCapacity);
-    }
-
     public ListFrame() {
         data = this;
     }
@@ -58,14 +56,71 @@ public class ListFrame<E> extends ArrayList<E> {
         data = (ListFrame<E>) c;
     }
 
+    @Override
+    public boolean add(E e) {
+        addInnerColumnData(e);
+        return super.add(e);
+    }
+
+    private void addInnerColumnData(E e) {
+        if (e instanceof Map) {
+            Map map = (Map) e;
+            for (Object o : map.keySet()) {
+                if (!columns.contains((String) o)) {
+                    columns.add((String) o);
+                }
+                ListFrame<Object> columnList = columnData.get(o);
+                if (columnList == null) {
+                    columnList = new ListFrame();
+                    columnList.add(map.get(o));
+                    columnData.put((String) o, columnList);
+                } else {
+                    columnList.add(map.get(o));
+                }
+            }
+        } else {
+            Field[] fields = e.getClass().getDeclaredFields();
+
+            for (Field field : fields) {
+                int mod = field.getModifiers();
+                if (Modifier.isStatic(mod) || Modifier.isFinal(mod)) {
+                    continue;
+                }
+                if (!columns.contains(field.getName())) {
+                    columns.add(field.getName());
+                }
+                field.setAccessible(true);
+                Object value = null;
+                try {
+                    value = field.get(e);
+                } catch (IllegalAccessException ex) {
+                    ex.printStackTrace();
+                }
+                ListFrame<Object> columnList = columnData.get(field.getName());
+                if (columnList == null) {
+                    columnList = new ListFrame();
+                    columnList.add(value);
+                    columnData.put(field.getName(), columnList);
+                } else {
+                    columnList.add(value);
+                }
+                field.setAccessible(false);
+            }
+        }
+    }
+
     public static <E> ListFrame<E> fromList(List<E> list) {
         if (list instanceof ListFrame) {
             return (ListFrame<E>) list;
         }
         ListFrame<E> listFrame = new ListFrame();
-        for (E e : list) {
-            listFrame.add(e);
+        Iterator<E> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            listFrame.add(iterator.next());
         }
+//        for (E e : list) {
+//            listFrame.add(e);
+//        }
         return listFrame;
     }
 
@@ -248,14 +303,13 @@ public class ListFrame<E> extends ArrayList<E> {
             String[] titles = null;
             if ((line = br.readLine()) != null) {
                 titles = line.split(splitBy);
-                listFrame.setColumns(Arrays.stream(titles).collect(Collectors.toList()));
             }
             while ((line = br.readLine()) != null) {
                 String[] split = line.split(splitBy);
                 Map map = new LinkedHashMap();
                 for (int i = 0; i < split.length; i++) {
                     map.put(titles[i], getTypeValue(split[i], columnTypes.get(i)));
-                    setListColumns(listFrame, titles[i], getTypeValue(split[i], columnTypes.get(i)));
+//                    setListColumns(listFrame, titles[i], getTypeValue(split[i], columnTypes.get(i)));
                 }
                 listFrame.add(map);
             }
@@ -312,14 +366,14 @@ public class ListFrame<E> extends ArrayList<E> {
             String[] titles = null;
             if ((line = br.readLine()) != null) {
                 titles = line.split(splitBy);
-                listFrame.setColumns(Arrays.stream(titles).collect(Collectors.toList()));
+//                listFrame.setColumns(Arrays.stream(titles).collect(Collectors.toList()));
             }
             while ((line = br.readLine()) != null) {
                 String[] split = line.split(splitBy);
                 Map map = new LinkedHashMap();
                 for (int i = 0; i < split.length; i++) {
                     map.put(titles[i], split[i]);
-                    setListColumns(listFrame, titles[i], split[i]);
+//                    setListColumns(listFrame, titles[i], split[i]);
                 }
                 listFrame.add(map);
             }
@@ -402,7 +456,7 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public ListFrame<E> replace(String src, String tar) {
-        if (data==null ||data.size()==0 ) {
+        if (data == null || data.size() == 0) {
             return new ListFrame<E>();
         }
         Object o = data.get(0);
@@ -422,7 +476,6 @@ public class ListFrame<E> extends ArrayList<E> {
                 }
                 numFrame.add(map);
             }
-            numFrame.setColumns(data.getColumns());
             return (ListFrame<E>) numFrame;
         } else {
             throw new RuntimeException("please define a property that you want to replace!");
@@ -430,7 +483,7 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public ListFrame<E> replace(String column, String src, String tar) {
-        if (data==null ||data.size()==0 ) {
+        if (data == null || data.size() == 0) {
             return new ListFrame<E>();
         }
         Object o = data.get(0);
@@ -457,19 +510,56 @@ public class ListFrame<E> extends ArrayList<E> {
         }
     }
 
-    public ListFrame<E> handle(Predicate<E> condition, DataHandlerInterface<E> dataProcess) {
-        if (data==null ||data.size()==0 ) {
+    public ListFrame<E> addHandler(DataHandlerInterface<E> dataProcess) {
+        dataHandlers.add(dataProcess);
+        return this;
+    }
+
+    public ListFrame<E> addHandler(String expressions) {
+        expHandlers.add(expressions);
+        return this;
+    }
+
+    public synchronized ListFrame<E> execute() {
+        if (data == null || data.size() == 0) {
+            return new ListFrame<E>();
+        }
+        ListFrame<E> numFrame = new ListFrame<E>();
+        Iterator<E> iterator = data.iterator();
+        while (iterator.hasNext()) {
+            E datum = iterator.next();
+            for (DataHandlerInterface<E> eDataHandlerInterface : dataHandlers) {
+                datum = eDataHandlerInterface.handle(datum);
+            }
+            for (String expHandler : expHandlers) {
+                List<ExpressionMap> ops = ExpressUtil.getOperates(expHandler);
+                for (ExpressionMap op : ops) {
+                    datum = ExpressUtil.operate(datum, op);
+                }
+            }
+            numFrame.add(datum);
+
+        }
+        dataHandlers.clear();
+        expHandlers.clear();
+        return numFrame;
+    }
+
+    public ListFrame<E> handle(Predicate<E> condition, DataHandlerInterface<E>... dataProcessArray) {
+        if (data == null || data.size() == 0) {
             return new ListFrame<E>();
         }
         ListFrame<E> numFrame = new ListFrame<E>();
         for (E datum : data) {
             if (condition.test(datum)) {
-                numFrame.add(dataProcess.handle(datum));
+                for (DataHandlerInterface<E> eDataHandlerInterface : dataProcessArray) {
+                    datum = eDataHandlerInterface.handle(datum);
+                }
+                numFrame.add(datum);
             } else {
                 numFrame.add(datum);
             }
         }
-        numFrame.setColumns(data.getColumns());
         return numFrame;
     }
 
@@ -477,8 +567,12 @@ public class ListFrame<E> extends ArrayList<E> {
         return handle(a -> true, dataProcess);
     }
 
+    public ListFrame<E> handle(DataHandlerInterface<E>... dataProcess) {
+        return handle(a -> true, dataProcess);
+    }
+
     public ListFrame<E> handle(Predicate<E> condition, String ifExpressions, String elseExpressions) {
-        if (data==null ||data.size()==0 ) {
+        if (data == null || data.size() == 0) {
             return new ListFrame<E>();
         }
         List<ExpressionMap> ifOps = ExpressUtil.getOperates(ifExpressions);
@@ -497,25 +591,33 @@ public class ListFrame<E> extends ArrayList<E> {
             }
             numFrame.add(datum);
         }
-        numFrame.setColumns(data.getColumns());
         return numFrame;
     }
 
-    public ListFrame<E> handle(Predicate<E> condition, String expressions) {
-        if (data==null ||data.size()==0 ) {
+    public ListFrame<E> handle(Predicate<E> condition, String... expressions) {
+        if (data == null || data.size() == 0) {
             return new ListFrame<E>();
         }
         List<ExpressionMap> ops = ExpressUtil.getOperates(expressions);
         ListFrame<E> numFrame = new ListFrame<E>();
-        for (E datum : data) {
-            for (ExpressionMap op : ops) {
-                if (condition.test(datum)) {
+        Iterator<E> iterator = data.iterator();
+        while (iterator.hasNext()) {
+            E datum = iterator.next();
+            if (condition.test(datum)) {
+                for (ExpressionMap op : ops) {
                     datum = ExpressUtil.operate(datum, op);
                 }
             }
             numFrame.add(datum);
         }
-        numFrame.setColumns(data.getColumns());
+//        for (E datum : data) {
+//            for (ExpressionMap op : ops) {
+//                if (condition.test(datum)) {
+//                    datum = ExpressUtil.operate(datum, op);
+//                }
+//            }
+//            numFrame.add(datum);
+//        }
         return numFrame;
     }
 
@@ -524,19 +626,31 @@ public class ListFrame<E> extends ArrayList<E> {
         return handle(a -> true, expressions);
     }
 
+    public ListFrame<E> handle(String... expressions) {
+        return handle(a -> true, expressions);
+    }
+
     public <T> ListFrame<T> handle(Predicate<E> condition, Function<E, T> fun) {
-        if (data==null ||data.size()==0 ) {
+        if (data == null || data.size() == 0) {
             return new ListFrame<T>();
         }
         ListFrame<T> numFrame = new ListFrame<T>();
-        for (E datum : data) {
+        Iterator<E> iterator = data.iterator();
+        while (iterator.hasNext()) {
+            E datum = iterator.next();
             if (condition.test(datum)) {
                 numFrame.add(fun.apply(datum));
             } else {
                 numFrame.add((T) datum);
             }
         }
-        numFrame.setColumns(data.getColumns());
+//        for (E datum : data) {
+//            if (condition.test(datum)) {
+//                numFrame.add(fun.apply(datum));
+//            } else {
+//                numFrame.add((T) datum);
+//            }
+//        }
         return numFrame;
     }
 
@@ -545,7 +659,7 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public MapFrame<Object, ListFrame> groupBy(String columnName) {
-        if (data==null ||data.size()==0) {
+        if (data == null || data.size() == 0) {
             return new MapFrame<>();
         }
         MapFrame<Object, ListFrame> groupMap = new MapFrame<>();
@@ -582,7 +696,7 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public int argmax() {
-        if (data==null ||data.size()==0) {
+        if (data == null || data.size() == 0) {
             return 0;
         }
         if (doublePattern.matcher(data.get(0).toString()).find()) {
@@ -590,7 +704,7 @@ public class ListFrame<E> extends ArrayList<E> {
             int index = 0;
             int n = 0;
             for (E datum : data) {
-                if (datum==null) {
+                if (datum == null) {
                     continue;
                 }
                 double a = Double.valueOf(datum + "");
@@ -606,7 +720,7 @@ public class ListFrame<E> extends ArrayList<E> {
             int index = 0;
             int n = 0;
             for (E datum : data) {
-                if (datum==null) {
+                if (datum == null) {
                     continue;
                 }
                 int a = Integer.valueOf(datum + "");
@@ -621,13 +735,13 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public <T> T max() {
-        if (data==null ||data.size()==0) {
+        if (data == null || data.size() == 0) {
             return null;
         }
         if (doublePattern.matcher(data.get(0).toString()).find()) {
             Double max = Double.MIN_VALUE;
             for (E datum : data) {
-                if (datum==null) {
+                if (datum == null) {
                     continue;
                 }
                 double a = Double.valueOf(datum + "");
@@ -639,7 +753,7 @@ public class ListFrame<E> extends ArrayList<E> {
         } else {
             Integer max = 0;
             for (E datum : data) {
-                if (datum==null) {
+                if (datum == null) {
                     continue;
                 }
                 int a = Integer.valueOf(datum + "");
@@ -653,7 +767,7 @@ public class ListFrame<E> extends ArrayList<E> {
 
 
     public int argmin() {
-        if (data==null ||data.size()==0 ) {
+        if (data == null || data.size() == 0) {
             return 0;
         }
         if (doublePattern.matcher(data.get(0).toString()).find()) {
@@ -661,7 +775,7 @@ public class ListFrame<E> extends ArrayList<E> {
             int index = 0;
             int n = 0;
             for (E datum : data) {
-                if (datum==null) {
+                if (datum == null) {
                     continue;
                 }
                 double a = Double.valueOf(datum + "");
@@ -677,7 +791,7 @@ public class ListFrame<E> extends ArrayList<E> {
             int index = 0;
             int n = 0;
             for (E datum : data) {
-                if (datum==null) {
+                if (datum == null) {
                     continue;
                 }
                 int a = Integer.valueOf(datum + "");
@@ -692,13 +806,13 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public <T> T min() {
-        if (data==null ||data.size()==0) {
+        if (data == null || data.size() == 0) {
             return null;
         }
         if (doublePattern.matcher(data.get(0).toString()).find()) {
             Double max = Double.MAX_VALUE;
             for (E datum : data) {
-                if (datum==null) {
+                if (datum == null) {
                     continue;
                 }
                 double a = Double.valueOf(datum + "");
@@ -710,7 +824,7 @@ public class ListFrame<E> extends ArrayList<E> {
         } else {
             Integer max = Integer.MAX_VALUE;
             for (E datum : data) {
-                if (datum==null) {
+                if (datum == null) {
                     continue;
                 }
                 int a = Integer.valueOf(datum + "");
@@ -723,12 +837,12 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public double avg() {
-        if (data==null ||data.size()==0) {
+        if (data == null || data.size() == 0) {
             return 0.0;
         }
         double sum = 0.0;
         for (E datum : data) {
-            if (datum==null) {
+            if (datum == null) {
                 continue;
             }
             double a = Double.valueOf(datum + "");
@@ -738,12 +852,12 @@ public class ListFrame<E> extends ArrayList<E> {
     }
 
     public double sum() {
-        if (data==null ||data.size()==0) {
+        if (data == null || data.size() == 0) {
             return 0.0;
         }
         double sum = 0.0;
         for (E datum : data) {
-            if (datum==null) {
+            if (datum == null) {
                 continue;
             }
             double a = Double.valueOf(datum + "");
@@ -803,7 +917,7 @@ public class ListFrame<E> extends ArrayList<E> {
 
 
     public List<E> toList() {
-        return data;
+        return new CopyOnWriteArrayList<>(data);
     }
 
 
@@ -868,7 +982,7 @@ public class ListFrame<E> extends ArrayList<E> {
     public <T> ListFrame<T> dropNull() {
         ListFrame<T> listFrame = new ListFrame<>();
         for (E datum : data) {
-            if (datum!=null) {
+            if (datum != null) {
                 listFrame.add((T) datum);
             }
         }

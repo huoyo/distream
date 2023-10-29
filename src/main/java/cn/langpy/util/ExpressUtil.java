@@ -7,7 +7,6 @@ import cn.langpy.model.OperateMap;
 import cn.langpy.constant.ParamType;
 
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
@@ -21,6 +20,7 @@ public class ExpressUtil {
     private static Pattern subOperateSymbol = Pattern.compile(".*'.*-+.*'.*");
 
     private static Map<String, Field> fieldMap = new ConcurrentHashMap<>();
+    private static Map<String, List<ExpressionMap>> expressesMap = new ConcurrentHashMap<>();
 
     private static Pattern operatePattern = Pattern.compile("[-+*/]+");
 
@@ -79,45 +79,55 @@ public class ExpressUtil {
         return false;
     }
 
-    public static List<ExpressionMap> getOperates(String expresses) {
+    public static List<ExpressionMap> getOperates(String... expressesArray) {
         List<ExpressionMap> ops = new ArrayList<>();
-        String[] expressesSplit = expresses.split(";");
-        for (String express : expressesSplit) {
-            String[] expressSplit = express.split("=");
-            String leftKey = expressSplit[0].trim();
-            String rights = expressSplit[1].trim();
-            String[] rightsSplit = rights.split("[-+*/]+");
-            if (subOperateSymbol.matcher(rights).find()) {
-                rightsSplit = rights.split("[+*/]+");
-            }else {
-                rightsSplit = rights.split("[-+*/]+");
+        for (String expresses : expressesArray) {
+            if (expressesMap.containsKey(expresses)) {
+                ops.addAll(expressesMap.get(expresses));
+                continue;
             }
+            List<ExpressionMap> ops_ = new ArrayList<>();
+            String[] expressesSplit = expresses.split(";");
+            for (String express : expressesSplit) {
+                String[] expressSplit = express.split("=");
+                String leftKey = expressSplit[0].trim();
+                String rights = expressSplit[1].trim();
+                String[] rightsSplit = rights.split("[-+*/]+");
+                if (subOperateSymbol.matcher(rights).find()) {
+                    rightsSplit = rights.split("[+*/]+");
+                }else {
+                    rightsSplit = rights.split("[-+*/]+");
+                }
 
-            String operateKey1 = rightsSplit[0].trim();
-            String operateKey2 = null;
-            if (rightsSplit.length > 1) {
-                operateKey2 = rightsSplit[1].trim();
-            }
-            Matcher m = null;
-            if (subOperateSymbol.matcher(express).find()) {
-                m = operatePattern_.matcher(express);
-            }else {
-                m = operatePattern.matcher(express);
-            }
-            String operater = "AAAA";
-            if (m.find()) {
-                operater = m.group();
-            }
+                String operateKey1 = rightsSplit[0].trim();
+                String operateKey2 = null;
+                if (rightsSplit.length > 1) {
+                    operateKey2 = rightsSplit[1].trim();
+                }
+                Matcher m = null;
+                if (subOperateSymbol.matcher(express).find()) {
+                    m = operatePattern_.matcher(express);
+                }else {
+                    m = operatePattern.matcher(express);
+                }
+                String operater = "AAAA";
+                if (m.find()) {
+                    operater = m.group();
+                }
 
-            ExpressionMap expressionMap = new ExpressionMap();
-            expressionMap.setAssignKey(leftKey);
-            expressionMap.setOperateSymbol(operater);
-            OperateMap leftOperateMap = getOperateInfo(operateKey1);
-            OperateMap rightOperateMap = getOperateInfo(operateKey2);
-            expressionMap.setOperate1(leftOperateMap);
-            expressionMap.setOperate2(rightOperateMap);
-            ops.add(expressionMap);
+                ExpressionMap expressionMap = new ExpressionMap();
+                expressionMap.setAssignKey(leftKey);
+                expressionMap.setOperateSymbol(operater);
+                OperateMap leftOperateMap = getOperateInfo(operateKey1);
+                OperateMap rightOperateMap = getOperateInfo(operateKey2);
+                expressionMap.setOperate1(leftOperateMap);
+                expressionMap.setOperate2(rightOperateMap);
+                ops_.add(expressionMap);
+            }
+            ops.addAll(ops_);
+            expressesMap.put(expresses,ops_);
         }
+
         return ops;
     }
 
