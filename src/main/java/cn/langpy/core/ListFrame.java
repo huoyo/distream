@@ -53,7 +53,15 @@ public class ListFrame<E> extends ArrayList<E> {
 
     public ListFrame(Collection<E> c) {
         super(c);
-        data = (ListFrame<E>) c;
+        if (c instanceof ListFrame) {
+            data = (ListFrame<E>) c;
+        } else {
+            data = new ListFrame();
+            Iterator<E> iterator = c.iterator();
+            while (iterator.hasNext()) {
+                data.add(iterator.next());
+            }
+        }
     }
 
     @Override
@@ -107,6 +115,14 @@ public class ListFrame<E> extends ArrayList<E> {
                 field.setAccessible(false);
             }
         }
+    }
+
+    public static <E> ListFrame<E> asList(E... elements) {
+        ListFrame<E> listFrame = new ListFrame();
+        for (E e : elements) {
+            listFrame.add(e);
+        }
+        return listFrame;
     }
 
     public static <E> ListFrame<E> fromList(List<E> list) {
