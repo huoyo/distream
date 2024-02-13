@@ -471,6 +471,82 @@ public class ListFrame<E> extends ArrayList<E> {
         return listFrame;
     }
 
+    public <T> ListFrame<T> sortAsc() {
+        data.sort(new Comparator<E>() {
+            @Override
+            public int compare(E o1, E o2) {
+                if (o1 instanceof Number) {
+                    double v = ((Number) o1).doubleValue() - ((Number) o2).doubleValue();
+                    return (int) v;
+                } else if (o1 instanceof String) {
+                    double o1v = Double.valueOf(o1.toString()).doubleValue();
+                    double o2v = Double.valueOf(o2.toString()).doubleValue();
+                    double v = o1v - o2v;
+                    return (int) v;
+                }
+                return 0;
+            }
+        });
+        return (ListFrame<T>) data;
+    }
+
+    public <T> ListFrame<T> sortAsc(String columnName) {
+        data.sort(new Comparator<E>() {
+            @Override
+            public int compare(E o1, E o2) {
+                Object value1 = ExpressUtil.getValue(columnName, o1);
+                Object value2 = ExpressUtil.getValue(columnName, o2);
+                double o1v = Double.valueOf(value1.toString()).doubleValue();
+                double o2v = Double.valueOf(value2.toString()).doubleValue();
+                double v = o1v - o2v;
+                return (int) v;
+            }
+        });
+        return (ListFrame<T>) data;
+    }
+
+    public <T> ListFrame<T> sortDesc(String columnName) {
+        data.sort(new Comparator<E>() {
+            @Override
+            public int compare(E o1, E o2) {
+                Object value1 = ExpressUtil.getValue(columnName, o1);
+                Object value2 = ExpressUtil.getValue(columnName, o2);
+                double o1v = Double.valueOf(value1.toString()).doubleValue();
+                double o2v = Double.valueOf(value2.toString()).doubleValue();
+                double v = o2v - o1v;
+                return (int) v;
+            }
+        });
+        return (ListFrame<T>) data;
+    }
+
+    public <T> ListFrame<T> sortDesc() {
+        data.sort(new Comparator<E>() {
+            @Override
+            public int compare(E o1, E o2) {
+                if (o1 instanceof Number) {
+                    double v = ((Number) o2).doubleValue() - ((Number) o1).doubleValue();
+                    return (int) v;
+                } else if (o1 instanceof String) {
+                    double o1v = Double.valueOf(o1.toString()).doubleValue();
+                    double o2v = Double.valueOf(o2.toString()).doubleValue();
+                    double v = o2v - o1v;
+                    return (int) v;
+                }
+                return 0;
+            }
+        });
+        return (ListFrame<T>) data;
+    }
+
+    public <T> ListFrame<T> reverse() {
+        ListFrame<T> frame = new ListFrame<T>();
+        for (int i = data.size() - 1; i >= 0; i--) {
+            frame.add((T) data.get(i));
+        }
+        return frame;
+    }
+
     public ListFrame<E> replace(String src, String tar) {
         if (data == null || data.size() == 0) {
             return new ListFrame<E>();
