@@ -6,7 +6,7 @@
 [中文文档/CHINESE](README.md)
 
 <div >
-    <img src='https://shields.io/badge/version-1.1.0-green.svg'>
+    <img src='https://shields.io/badge/version-1.1.1-green.svg'>
     <img src='https://shields.io/badge/author-Chang Zhang-dbab09.svg'>
     <h4>An extended tool of List about how to process data fluently by lambda,expressions and custom class.</h4>
 </div>
@@ -51,7 +51,7 @@ lines = list.readSql("select * from xxx").handle(a->...).handle(a->...)...;
  <dependency>
     <groupId>cn.langpy</groupId>
     <artifactId>distream</artifactId>
-    <version>1.0.9version>
+    <version>1.1.1<version>
  </dependency>
 ```
 
@@ -246,7 +246,7 @@ lines = lines.handle("percent=double(value)");
 /*convert value to string*/
 lines = lines.handle("name=string(value)");
 
-/*substring like java substring*/
+/*substring is like java substring*/
 lines = lines.handle("name=substring(name,1,2)");
 
 /*replace "xxx" to "yyy"*/
@@ -254,7 +254,7 @@ lines = lines.handle("name=replace(name,'xxx','yyy')");
 /*you can alse use '-' to replace if you only want to replace 'xxx' */
 lines = lines.handle("name=name-'xxx'");
 
-/*index like java indexof*/
+/*index is like java indexof*/
 lines = lines.handle("id=index(name,'xxx')");
 
 /*round to the nearest hundredth*/
