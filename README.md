@@ -7,7 +7,7 @@
 [英文文档/ENGLISH](README-EN.md)
 
 <div align="center">
-    <img src='https://shields.io/badge/version-1.1.1-green.svg'>
+    <img src='https://shields.io/badge/version-1.1.2-green.svg'>
     <img src='https://shields.io/badge/author-Chang Zhang-dbab09.svg'>
     <h4>一个为Java语言开发的List扩展工具库，可用于list对象流式数据处理，包括自定义数据处理器、lambda表达式和等式计算等</h4>
     <h4>An extended tool of List about how to process data fluently by lambda,expressions and custom class.</h4>
@@ -16,6 +16,7 @@
 * 真正的数据流式丝滑处理
 
 ```java
+ListFrame<Map> lines = ListFrame.fromList(list);
 double sum = lines.get("value").sum();
 lines = lines
         .handle("value=format(value,2)") //round to the nearest hundredth
@@ -26,9 +27,10 @@ lines = lines
         .groupBy("name").sum("percent"); //groupBy 'name'
 ```
 
-* 性能更好的写法（v1.1.0支持）
+* 性能更好的写法（v1.1.0+支持）
 
 ```java
+ListFrame<Metric> lines = ListFrame.fromList(list);
 double sum = lines.get("value").sum();
 lines = lines
         .addHandler("value=format(value,2)") 
@@ -38,10 +40,11 @@ lines = lines
         .groupBy("name").sum("percent"); //groupBy 'name'
 ```
 
-* 更推荐的写法（v1.1.0支持，性能最好）
+* 更推荐的写法（v1.1.0+支持，性能最好）
 
 
 ```java
+ListFrame<Metric> lines = ListFrame.fromList(list);
 lines = lines
         .addHandler(new DataHandler1()) 
         .addHandler(new DataHandler2()) 
@@ -59,7 +62,7 @@ Datasource datesource = xxx;
 ListFrame list = new ListFrame();
 list.initDataSource(datesource);
 
-lines = list.readSql("select * from xxx").handle(a->...).handle(a->...)...;
+ListFrame<Map<String,Object>> lines = list.readSql("select * from xxx").handle(a->...).handle(a->...)...;
 ```
 
 > 注意：读取数据库的时候需要引入对应的连接驱动，比如Mysql:
@@ -80,7 +83,7 @@ lines = list.readSql("select * from xxx").handle(a->...).handle(a->...)...;
  <dependency>
     <groupId>cn.langpy</groupId>
     <artifactId>distream</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
  </dependency>
 ```
 
