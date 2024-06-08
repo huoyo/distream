@@ -11,6 +11,9 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.charset.Charset;
+import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -66,8 +69,24 @@ public class ListFrame<E> extends ArrayList<E> {
 
     @Override
     public boolean add(E e) {
-        addInnerColumnData(e);
+        if (e!=null && !isBaseType(e)) {
+            addInnerColumnData(e);
+        }
         return super.add(e);
+    }
+
+    private boolean isBaseType(E e){
+        if (e instanceof Number ||
+                e instanceof String ||
+                e instanceof Character ||
+                e instanceof LocalDateTime ||
+                e instanceof Date ||
+                e instanceof Time ||
+                e instanceof LocalDate ||
+                e instanceof Boolean) {
+            return true;
+        }
+        return false;
     }
 
     private void addInnerColumnData(E e) {
