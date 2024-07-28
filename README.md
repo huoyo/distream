@@ -7,7 +7,7 @@
 [英文文档/ENGLISH](README-EN.md)
 
 <div align="center">
-    <img src='https://shields.io/badge/version-1.1.2-green.svg'>
+    <img src='https://shields.io/badge/version-1.1.3-green.svg'>
     <img src='https://shields.io/badge/author-Chang Zhang-dbab09.svg'>
     <h4>一个为Java语言开发的List扩展工具库，可用于list对象流式数据处理，包括自定义数据处理器、lambda表达式和等式计算等</h4>
     <h4>An extended tool of List about how to process data fluently by lambda,expressions and custom class.</h4>
