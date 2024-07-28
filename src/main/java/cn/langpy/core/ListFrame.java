@@ -16,12 +16,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-
+/**
+ * zhangchang
+ */
 public class ListFrame<E> extends ArrayList<E> {
     private static Pattern doublePattern = Pattern.compile("^[0-9]+\\.[0-9]+$");
 
@@ -721,14 +724,7 @@ public class ListFrame<E> extends ArrayList<E> {
             }
             numFrame.add(datum);
         }
-//        for (E datum : data) {
-//            for (ExpressionMap op : ops) {
-//                if (condition.test(datum)) {
-//                    datum = ExpressUtil.operate(datum, op);
-//                }
-//            }
-//            numFrame.add(datum);
-//        }
+
         return numFrame;
     }
 
@@ -1099,4 +1095,48 @@ public class ListFrame<E> extends ArrayList<E> {
         }
         return listFrame;
     }
+
+    public E sample() {
+        int i = ThreadLocalRandom.current().nextInt(this.size());
+        return this.get(i);
+    }
+
+    public ListFrame<E> sample(int n) {
+        if (n<=0) {
+            throw new RuntimeException("the number you want to sample can not <= 0!");
+        }
+        int size = this.size();
+        ListFrame<E> listFrame = new ListFrame<>();
+        for (int i = 0; i < n; i++) {
+            int index = ThreadLocalRandom.current().nextInt(size);
+            listFrame.add(this.get(index));
+        }
+        return listFrame;
+    }
+
+    public ListFrame<E> sample(int n,boolean duplicate) {
+        if (n<=0) {
+            throw new RuntimeException("the number you want to sample can not <= 0!");
+        }
+        if (duplicate) {
+            return sample(n);
+        }
+        int size = this.size();
+        if (n>size) {
+            throw new RuntimeException("the number you want to sample can not > the size of the list!");
+        }
+        List<Integer> list = new ArrayList<>();
+        ListFrame<E> listFrame = new ListFrame<>();
+        while (listFrame.size()<n){
+            int index = ThreadLocalRandom.current().nextInt(size);
+            if (list.contains(index)) {
+                continue;
+            }
+            listFrame.add(this.get(index));
+            list.add(index);
+        }
+        return listFrame;
+    }
+
+
 }
